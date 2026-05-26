@@ -4,6 +4,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { AppShell } from "@/components/AppShell";
+import { CookieConsent } from "@/components/CookieConsent";
 import { SITE } from "@/lib/site";
 
 const geistSans = Geist({
@@ -39,6 +40,11 @@ export const metadata: Metadata = {
   publisher: SITE.author,
   alternates: {
     canonical: "/",
+    types: {
+      "application/rss+xml": [
+        { url: "/feed.xml", title: `${SITE.name} — Blog RSS` },
+      ],
+    },
   },
   // manifest + icons are auto-wired by app/manifest.ts, app/icon.tsx and
   // app/apple-icon.tsx — no explicit URLs needed here.
@@ -116,6 +122,7 @@ export default function RootLayout({
           }}
         />
         <AppShell>{children}</AppShell>
+        <CookieConsent />
         <VercelAnalytics />
       </body>
       <GoogleAnalytics gaId={SITE.gaId} />

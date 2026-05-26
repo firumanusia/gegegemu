@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllGames, getAllCategories } from "@/lib/games";
+import { getAllPosts } from "@/lib/blog";
 import { SITE } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -8,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: SITE.url, lastModified: now, changeFrequency: "daily", priority: 1.0 },
     { url: `${SITE.url}/games`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE.url}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE.url}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE.url}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE.url}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
@@ -30,5 +32,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: game.featured ? 0.9 : 0.8,
   }));
 
-  return [...staticRoutes, ...categoryRoutes, ...gameRoutes];
+  const blogRoutes: MetadataRoute.Sitemap = getAllPosts().map((p) => ({
+    url: `${SITE.url}/blog/${p.slug}`,
+    lastModified: new Date(p.updatedAt ?? p.publishedAt),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...categoryRoutes, ...gameRoutes, ...blogRoutes];
 }

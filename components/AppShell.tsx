@@ -107,9 +107,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div>
                 <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-white">Site</h3>
                 <ul className="space-y-2">
+                  <li><a className="hover:text-[var(--color-accent)]" href="/blog">Blog</a></li>
                   <li><a className="hover:text-[var(--color-accent)]" href="/about">About</a></li>
                   <li><a className="hover:text-[var(--color-accent)]" href="/contact">Contact</a></li>
                   <li><a className="hover:text-[var(--color-accent)]" href="/sitemap.xml">Sitemap</a></li>
+                  <li><a className="hover:text-[var(--color-accent)]" href="/feed.xml">RSS feed</a></li>
                 </ul>
               </div>
               <div>
