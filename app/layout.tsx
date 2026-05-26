@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { AppShell } from "@/components/AppShell";
 import { SITE } from "@/lib/site";
@@ -115,6 +116,7 @@ export default function RootLayout({
         />
         <AppShell>{children}</AppShell>
       </body>
+      <GoogleAnalytics gaId={SITE.gaId} />
     </html>
   );
 }

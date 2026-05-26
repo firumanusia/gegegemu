@@ -26,6 +26,7 @@ export const SITE = {
   themeColor: "#ff6b35",
   backgroundColor: "#050818",
   ogImage: "/og/default.png",
+  gaId: "G-J9TJJ71SXB",
 } as const;
 
 export function absoluteUrl(path: string): string {
