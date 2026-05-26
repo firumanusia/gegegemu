@@ -147,6 +147,7 @@ export default async function GamePage({
       />
       <GamePlayer
         src={resolveGamePath(game.path)}
+        slug={game.slug}
         title={game.title}
         aspectRatio={game.aspectRatio}
       />

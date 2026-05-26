@@ -4,6 +4,7 @@ import { Dices } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Game } from "@/lib/types";
+import { track } from "@/lib/analytics";
 
 export function SurpriseButton({ games }: { games: Game[] }) {
   const router = useRouter();
@@ -16,6 +17,7 @@ export function SurpriseButton({ games }: { games: Game[] }) {
         if (games.length === 0) return;
         setSpinning(true);
         const pick = games[Math.floor(Math.random() * games.length)];
+        track("surprise_me", { picked_slug: pick.slug });
         setTimeout(() => router.push(`/games/${pick.slug}`), 250);
       }}
       className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/60 px-3.5 py-2 text-sm font-medium text-white transition-all hover:border-[var(--color-accent)] hover:bg-[var(--color-surface-2)] active:scale-95"

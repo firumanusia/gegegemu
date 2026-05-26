@@ -3,13 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Maximize2, RotateCcw, Play } from "lucide-react";
 import { parseAspectRatio } from "@/lib/games";
+import { track } from "@/lib/analytics";
 
 export function GamePlayer({
   src,
+  slug,
   title,
   aspectRatio,
 }: {
   src: string;
+  slug: string;
   title: string;
   aspectRatio: string;
 }) {
@@ -26,6 +29,7 @@ export function GamePlayer({
       document.exitFullscreen();
     } else {
       el.requestFullscreen?.().catch(() => {});
+      track("fullscreen_game", { game_slug: slug, game_title: title });
     }
   }
 
@@ -33,6 +37,12 @@ export function GamePlayer({
     if (!iframeRef.current) return;
     setLoaded(false);
     iframeRef.current.src = iframeRef.current.src;
+    track("restart_game", { game_slug: slug, game_title: title });
+  }
+
+  function play() {
+    setStarted(true);
+    track("play_game", { game_slug: slug, game_title: title });
   }
 
   useEffect(() => {
@@ -62,7 +72,7 @@ export function GamePlayer({
         {!started ? (
           <button
             type="button"
-            onClick={() => setStarted(true)}
+            onClick={play}
             className="group absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[var(--color-surface-2)] to-[var(--color-surface)]"
           >
             <div

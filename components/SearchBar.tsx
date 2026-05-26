@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { track } from "@/lib/analytics";
 
 export function SearchBar({ initial = "" }: { initial?: string }) {
   const [value, setValue] = useState(initial);
@@ -14,6 +15,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
       onSubmit={(e) => {
         e.preventDefault();
         const q = value.trim();
+        if (q) track("site_search", { search_term: q });
         router.push(q ? `/games?q=${encodeURIComponent(q)}` : "/games");
       }}
       className="relative w-full max-w-md"
