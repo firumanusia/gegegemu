@@ -66,7 +66,7 @@ export async function GET(
                 fontSize: 28,
               }}
             >
-              ✦
+              g
             </div>
             <div style={{ display: "flex" }}>
               <span style={{ color: "#f1f5f9" }}>gege</span>

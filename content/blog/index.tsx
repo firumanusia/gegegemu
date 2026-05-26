@@ -27,6 +27,525 @@ function C({ slug, children }: { slug: string; children: React.ReactNode }) {
 
 export const posts: BlogPost[] = [
   {
+    slug: "best-free-arcade-games-2026",
+    title: "9 Best Free Arcade Games to Play in Your Browser",
+    description:
+      "Fast-paced arcade games you can play right now — no downloads, no sign-ups. Reflex testers, endless runners, and one-button classics.",
+    publishedAt: "2026-05-28",
+    tags: ["arcade", "best-of", "browser-games"],
+    accent: "#ef4444",
+    readingTime: 5,
+    body: () => (
+      <>
+        <p>
+          Arcade games are the snackable counterpart to puzzles — quick rounds,
+          twitchy reflexes, and a high-score loop that makes you say
+          &quot;just one more&quot;. Here are nine free arcade games on{" "}
+          <Link className="text-[var(--color-accent)] hover:underline font-medium" href="/">
+            gegegemu
+          </Link>{" "}
+          that nail that loop, all playable in a browser tab.
+        </p>
+
+        <h2>1. <G slug="tunnel-runner">Tunnel Runner</G></h2>
+        <p>
+          A 3D endless runner where you pilot a glowing ship through a
+          procedurally generated neon tunnel. Speed climbs the longer you
+          survive. Mouse-aim or keyboard, your choice. The framerate is
+          buttery and the cubes you dodge get progressively meaner.
+          <strong> Average round: 30s–2 min.</strong>
+        </p>
+
+        <h2>2. <G slug="neon-drift">Neon Drift</G></h2>
+        <p>
+          A lane-dodge racer down a neon-edged highway. A / D to switch lanes,
+          dodge slower cars, grab orange sparks for nitro boost. The KM/H
+          counter ticks up the longer you survive — a perfect &quot;I just
+          want a 90-second adrenaline hit&quot; game.
+        </p>
+
+        <h2>3. <G slug="sparkstorm">Sparkstorm</G></h2>
+        <p>
+          A top-down twin-stick arena shooter. WASD to move, mouse to aim,
+          click to fire. Three enemy types, escalating waves, three hearts.
+          Polished particle bursts and screen-shake on every hit. The closest
+          we have to a pure &quot;dopamine in 60 seconds&quot; loop.
+        </p>
+
+        <h2>4. <G slug="stacker">Stacker</G></h2>
+        <p>
+          One-button arcade timing classic. Tap to drop a moving block onto
+          your stack. Miss the alignment, the overhang gets chopped. The
+          tower gets thinner — and the round gets harder — with every miss.
+          The kind of game you fail at, immediately restart, and 20 minutes
+          later wonder what happened to your morning.
+        </p>
+
+        <h2>5. <G slug="color-rush">Color Rush</G></h2>
+        <p>
+          A 4-color rotating wheel + a falling ball. Spin the wheel to match
+          the ball&apos;s color before it hits. Speed ramps up with every
+          correct match. Pure twitch reflex — your hands learn the patterns
+          before your brain does.
+        </p>
+
+        <h2>6. <G slug="whack-spark">Whack-a-Spark</G></h2>
+        <p>
+          The classic whack-a-mole, brand-themed: tap glowing orange sparks,
+          <strong> avoid</strong> the red bombs. Three strikes you&apos;re out.
+          Trains the same cognitive system as Stroop tests — selective
+          response under time pressure.
+        </p>
+
+        <h2>7. <G slug="sky-stack">Sky Stack</G></h2>
+        <p>
+          A polished 3D timing game — drop tetromino-like slabs to build a
+          tower into the sky. Real-time WebGL lighting, soft shadows, ACES
+          tone mapping. The kind of game that used to require a Unity
+          download and now runs as a 15 KB browser page.
+        </p>
+
+        <h2>8. <G slug="breakout">Brick Break</G></h2>
+        <p>
+          The wall-of-bricks classic. Bounce a ball off your paddle, smash
+          every brick, don&apos;t let it past. Modernized with bloom on the
+          paddle, particle bursts on brick destruction, and screen-shake on
+          last-life crash.
+        </p>
+
+        <h2>9. <G slug="snake">Snake</G></h2>
+        <p>
+          The Nokia classic, polished up. Smooth movement, gradient body
+          (head bright, tail darker), particle bursts on food eaten, swipe
+          support on mobile. Still the perfect minute-killer.
+        </p>
+
+        <h2>What makes an arcade game stick</h2>
+        <p>
+          Three traits, identical to puzzles but tuned faster: <strong>readable rules</strong>{" "}
+          (you know what to do in 5 seconds), <strong>tight feedback loop</strong>{" "}
+          (clear win/loss signal every 30 seconds), and <strong>visible progression</strong>{" "}
+          (score that climbs, distance that grows). The best arcade games
+          feel like a slot machine you control.
+        </p>
+
+        <p>
+          Want more? Browse the whole <C slug="arcade">arcade category</C> for
+          new additions.
+        </p>
+      </>
+    ),
+  },
+
+  {
+    slug: "how-to-play-minesweeper",
+    title: "How to Play Minesweeper: A No-Guessing Strategy Guide",
+    description:
+      "Master the classic Windows puzzle. Learn the numbers, the patterns, and how to win without ever guessing.",
+    publishedAt: "2026-05-28",
+    tags: ["minesweeper", "tutorial", "strategy", "puzzle"],
+    accent: "#3b82f6",
+    readingTime: 7,
+    body: () => (
+      <>
+        <p>
+          <G slug="minesweeper">Minesweeper</G> looks simple until your third
+          click ends the game. It&apos;s a pure logic puzzle hiding behind a
+          deceptively casual interface. This guide walks through the rules,
+          the deduction patterns that solve 90% of boards, and how to play
+          without ever guessing.
+        </p>
+
+        <h2>The rules in 30 seconds</h2>
+        <ul>
+          <li>The board is a grid of hidden tiles. A fixed number of tiles are mines.</li>
+          <li>Left-click a tile to reveal it.</li>
+          <li>If it&apos;s a mine, you lose.</li>
+          <li>If it&apos;s not, it shows a number: how many mines are in its 8 neighboring tiles. A blank tile means zero — and its neighbors auto-reveal.</li>
+          <li>Right-click (or long-press on mobile) to flag a tile you suspect is a mine.</li>
+          <li>Win condition: reveal every non-mine tile.</li>
+        </ul>
+
+        <h2>Strategy 1: the first click is always safe</h2>
+        <p>
+          On every Minesweeper implementation worth playing — including
+          ours — the first click can never be a mine. The board is
+          generated to ensure this. So your first click should be in the
+          middle of the board, not the corner. Center clicks have 8 neighbors,
+          corner clicks have only 3. More neighbors = more information.
+        </p>
+
+        <h2>Strategy 2: read the numbers as constraints</h2>
+        <p>
+          A &quot;1&quot; means exactly one of its 8 (or fewer, at edges)
+          neighbors is a mine. A &quot;2&quot; means exactly two. The art of
+          Minesweeper is layering those constraints until you can deduce
+          where every mine lies.
+        </p>
+        <p>
+          The simplest deduction: a &quot;1&quot; with only one unrevealed
+          neighbor. That neighbor <em>must</em> be the mine. Flag it.
+        </p>
+
+        <h2>Strategy 3: the 1-2-1 pattern</h2>
+        <p>
+          When you see three numbers in a row along the edge of revealed
+          tiles — <strong>1, 2, 1</strong> — there&apos;s a famous pattern:
+          the mines are under the cells adjacent to the two &quot;1&quot;s,
+          not the one under the &quot;2&quot;. Memorize this. It unlocks
+          dozens of board configurations.
+        </p>
+
+        <h2>Strategy 4: the 1-1 pattern</h2>
+        <p>
+          Two adjacent &quot;1&quot;s near an edge: if both share the same
+          set of unrevealed neighbors, you can&apos;t immediately deduce
+          which is the mine. But if one of them has an extra unrevealed
+          neighbor the other doesn&apos;t, that <em>extra</em> neighbor is
+          safe — because the shared neighbor must be the mine to satisfy both
+          constraints.
+        </p>
+
+        <h2>Strategy 5: count flags vs. number</h2>
+        <p>
+          If a &quot;3&quot; already has three flagged neighbors, the
+          remaining unrevealed neighbors are guaranteed safe. You can
+          left-click them with zero risk. This is the single biggest source
+          of &quot;free&quot; safe clicks late-game.
+        </p>
+
+        <h2>Strategy 6: when you must guess, count probability</h2>
+        <p>
+          Some boards force a 50/50 guess. That&apos;s not bad play — it&apos;s
+          unfortunate generation. When forced, pick the cell that gives you
+          the most <em>information</em> if it&apos;s safe (i.e., a cell with
+          many unrevealed neighbors), not the one that &quot;feels&quot; safer.
+        </p>
+
+        <h2>The opening: corner trick</h2>
+        <p>
+          After your safe first click in the middle, blanks cascade. If the
+          cascade leaves you with three small clusters of revealed tiles,
+          start working from the corners and edges — they have fewer
+          neighbors, so deduction is more constrained and starts earlier.
+        </p>
+
+        <h2>Common mistakes</h2>
+        <ul>
+          <li><strong>Reading a number without counting flags.</strong> A &quot;3&quot; tile next to two flags only constrains <em>one</em> remaining mine, not three.</li>
+          <li><strong>Flagging then forgetting to use it.</strong> Flags are deduction aids — re-scan numbers near your flags before clicking elsewhere.</li>
+          <li><strong>Misclicking out of speed.</strong> Most Minesweeper losses are clicks you didn&apos;t think about. Slow down at the 60% mark — that&apos;s where boards get punishing.</li>
+        </ul>
+
+        <h2>Why people still play it</h2>
+        <p>
+          Minesweeper is one of the purest logic games ever shipped — no
+          luck once the board is generated, no inventory, no progression
+          systems, just you and a constraint satisfaction problem. The
+          competitive scene runs sub-30-second 9×9 boards and sub-90-second
+          16×16 boards. You won&apos;t get there overnight. But you&apos;ll
+          get scary good at deduction-under-pressure, which transfers to
+          everything from debugging code to navigating a crowded supermarket.
+        </p>
+        <p>
+          Open <G slug="minesweeper">Minesweeper on gegegemu</G> — your first
+          click is always safe. Or browse other <C slug="puzzle">puzzle games</C>{" "}
+          if you want a different brand of brain workout.
+        </p>
+      </>
+    ),
+  },
+
+  {
+    slug: "best-3d-browser-games",
+    title: "5 Best Free 3D Games You Can Play in Your Browser",
+    description:
+      "Real-time 3D games that run in any browser — no plugins, no downloads. From tower stackers to space combat.",
+    publishedAt: "2026-05-27",
+    tags: ["3d", "best-of", "browser-games", "webgl"],
+    accent: "#a855f7",
+    readingTime: 5,
+    body: () => (
+      <>
+        <p>
+          Five years ago a polished 3D game in your browser required a Flash
+          plugin or a Unity download bigger than your operating system.
+          Today, browsers ship with native WebGL and (increasingly) WebGPU.
+          The result: actual 3D games running at 60 fps inside a tab, with
+          sub-second load times.
+        </p>
+        <p>
+          Here are five free 3D games on{" "}
+          <Link className="text-[var(--color-accent)] hover:underline font-medium" href="/">gegegemu</Link>{" "}
+          that show off what modern browsers can do.
+        </p>
+
+        <h2>1. <G slug="sky-stack">Sky Stack</G></h2>
+        <p>
+          A 3D tower stacker with proper lighting and shadows. Tap to drop a
+          block onto your tower; if you miss the alignment, the overhang
+          slices off and tumbles into the abyss with physics. The camera
+          follows you up as your stack climbs. Built with Three.js, ACES
+          filmic tone mapping, PCF soft shadows.{" "}
+          <strong>Tech showcase: dynamic lighting, shadow mapping, tumbling rigid-body chips.</strong>
+        </p>
+
+        <h2>2. <G slug="tunnel-runner">Tunnel Runner</G></h2>
+        <p>
+          A first-person 3D endless runner through a glowing neon tunnel.
+          Procedural obstacle generation, mouse-or-keyboard control, a
+          glowing ship that banks as you steer. The visual readability at
+          high speed is the genuinely hard problem this game solves — and it
+          solves it with motion-blur-style particle dust and color-coded
+          glow rings.
+        </p>
+
+        <h2>3. <G slug="star-burst">Star Burst</G> <em>(coming back soon)</em></h2>
+        <p>
+          A reimagining of Asteroids in 3D, originally built with Phaser.
+          Asteroids split into smaller chunks when hit, screen-shakes on
+          impact, particle bursts on every destruction. We&apos;re working on
+          a Three.js rebuild — until then, try{" "}
+          <G slug="sparkstorm">Sparkstorm</G> for the same arena-shooter feel
+          in 2D.
+        </p>
+
+        <h2>4. <G slug="cube-roll">Cube Roll</G></h2>
+        <p>
+          A 3D ball-roll puzzle. Tilt the world (with WASD / arrows) to roll
+          a chrome ball along floating platforms, collect gems, reach the
+          green ring goal. Falls take you out. Real-time shadows from a
+          directional light, third-person camera that follows the ball
+          smoothly. Marble-Madness DNA, browser delivery.
+        </p>
+
+        <h2>5. Something built with Babylon.js?</h2>
+        <p>
+          Three.js powers everything on this list. Babylon.js is a separate
+          WebGL engine with more out-of-box game features (physics, GUI,
+          scene loaders). We don&apos;t have a Babylon.js game yet, but
+          we&apos;re evaluating it for the next 3D addition. If you have a
+          favorite Babylon.js demo you&apos;d like to see ported, hit the{" "}
+          <Link className="text-[var(--color-accent)] hover:underline font-medium" href="/contact">contact page</Link>.
+        </p>
+
+        <h2>Why 3D in a browser is so impressive</h2>
+        <p>
+          The performance gap between &quot;dedicated game engine on desktop&quot;
+          and &quot;WebGL in a browser tab&quot; has shrunk dramatically. Modern
+          browsers expose GPU compute via WebGL2 and WebGPU. The bottleneck
+          is no longer the renderer — it&apos;s asset size (you don&apos;t
+          want to download 200 MB to play a 5-minute game) and battery life
+          on mobile (sustained 60 fps drains 10%+/hour). The games on this
+          list are deliberately small: each is under 1 MB including the
+          Three.js runtime, which is cached aggressively after the first
+          visit.
+        </p>
+
+        <h2>How fast do they actually load?</h2>
+        <p>
+          On a typical home connection:
+        </p>
+        <ul>
+          <li><strong>First visit:</strong> 600–900 KB (Three.js from jsDelivr CDN + the game itself), 0.8–1.5 seconds to interactive.</li>
+          <li><strong>Subsequent visits:</strong> 10–20 KB (just the game), under 200 ms to interactive.</li>
+        </ul>
+        <p>
+          For comparison, a single Instagram image is around 200 KB. We&apos;re
+          shipping entire 3D games for the price of a few feed photos.
+        </p>
+
+        <p>
+          Browse our <C slug="arcade">arcade category</C> for the full mix of
+          2D and 3D games.
+        </p>
+      </>
+    ),
+  },
+
+  {
+    slug: "free-online-card-games",
+    title: "Free Online Card Games You Can Play Right Now",
+    description:
+      "Spider Solitaire, Memory Match, and more card-style games to play free in your browser. No download needed.",
+    publishedAt: "2026-05-26",
+    tags: ["cards", "solitaire", "best-of"],
+    accent: "#22c55e",
+    readingTime: 4,
+    body: () => (
+      <>
+        <p>
+          Card games have been a coffee-break staple since long before computers.
+          Now you can play the classics in your browser, with smooth animations,
+          undo buttons, and zero patience for shuffling. Here&apos;s the
+          card-flavored corner of our catalog.
+        </p>
+
+        <h2>1. <G slug="spider">Spider Solitaire</G></h2>
+        <p>
+          The most popular solitaire variant. Goal: build runs of cards in
+          descending order from King to Ace, suit-by-suit, then clear them.
+          Played with one or two decks. Our build by Tomás Malbrán handles
+          undo, save state, hint highlights, and end-of-game statistics —
+          everything Windows Solitaire wishes it had.{" "}
+          <strong>Average game: 5–15 minutes.</strong>
+        </p>
+
+        <h2>2. <G slug="memory">Memory Match</G></h2>
+        <p>
+          Memory Match isn&apos;t strictly cards, but it uses the same
+          flip-two-find-pairs mechanic that&apos;s lived on playing-card
+          tables for decades. Flip two cards per turn, find the matching
+          pairs, clear the board. Quick, kid-friendly, and surprisingly
+          humbling for adults.
+        </p>
+
+        <h2>3. <G slug="2048">2048</G> as a card variant</h2>
+        <p>
+          Hot take: 2048 is structurally a card game. You play with numbered
+          tiles, combine matching values, build toward a higher target. The
+          fact that it&apos;s presented on a grid instead of a hand-fan
+          doesn&apos;t change what it is. Try it with that lens — the
+          strategy starts feeling like building a Rummy run.
+        </p>
+
+        <h2>Card games we&apos;re considering next</h2>
+        <ul>
+          <li><strong>Klondike Solitaire</strong> — the &quot;regular&quot; Windows solitaire. A Klondike build is on our shortlist.</li>
+          <li><strong>FreeCell</strong> — the deterministic solitaire variant where almost every game is solvable.</li>
+          <li><strong>Hearts</strong> — trick-taking with bots.</li>
+          <li><strong>Crazy Eights</strong> — quick, deterministic, family-friendly.</li>
+        </ul>
+
+        <h2>Why card games age well</h2>
+        <p>
+          The reason these games have survived for centuries is that they
+          combine <strong>visible state</strong> (you can see most of the
+          board) with <strong>hidden information</strong> (some cards face
+          down) and <strong>deterministic mechanics</strong> (rules are
+          clear, randomness is bounded by the deck). That mix produces deep
+          strategy without overwhelming new players.
+        </p>
+        <p>
+          For digital versions specifically: the undo button is a quiet
+          revolution. The cognitive cost of physical card games came from
+          tracking state in your head. Software handles that for you, so you
+          can focus purely on strategy. It&apos;s why Spider Solitaire on a
+          computer is genuinely a different game from Spider Solitaire with
+          a physical deck.
+        </p>
+
+        <p>
+          Browse all <C slug="card">card games</C>, or explore{" "}
+          <C slug="puzzle">puzzles</C> if you want pure logic instead.
+        </p>
+      </>
+    ),
+  },
+
+  {
+    slug: "snake-game-history",
+    title: "The Snake Game: A Surprisingly Long History",
+    description:
+      "From 1976 arcade cabinets to Nokia 3310 cultural icon to modern browser-game evergreen — a brief history of Snake.",
+    publishedAt: "2026-05-26",
+    tags: ["snake", "history", "retro", "arcade"],
+    accent: "#16a34a",
+    readingTime: 5,
+    body: () => (
+      <>
+        <p>
+          <G slug="snake">Snake</G> feels like one of those games that has
+          always existed. Eat, grow, don&apos;t bite your tail. It&apos;s the
+          minimum viable arcade loop. But the game has a real history — and
+          tracing it explains a lot about why it&apos;s still everywhere.
+        </p>
+
+        <h2>1976: Gremlin Industries&apos; <em>Blockade</em></h2>
+        <p>
+          The first commercial &quot;snake&quot;-style game was <em>Blockade</em>,
+          an arcade cabinet made by Gremlin Industries in 1976. Two players
+          steered trails that grew permanently and lost if they collided
+          with anything — wall or trail. The mechanic was a hit in arcades
+          and spawned a cluster of clones (<em>Surround</em> on Atari 2600,
+          <em>Worm</em>, <em>Hustle</em>) within two years.
+        </p>
+
+        <h2>1980s: home computer ports</h2>
+        <p>
+          By the early 80s, &quot;snake&quot; was a staple on home computers.
+          Commodore PET had a version. Apple II had a version. TRS-80 had a
+          version. Many were called <em>Worm</em> or <em>Nibbler</em>. The
+          mechanic was simple enough to fit in 2 KB of code — exactly the
+          kind of thing a hobbyist programmer could ship in a magazine
+          listing.
+        </p>
+
+        <h2>1997: Nokia 6110</h2>
+        <p>
+          The single moment that turned Snake into a global cultural icon
+          was its inclusion in the Nokia 6110, then again the 3210, and most
+          famously the 3310. Designer Taneli Armanto built it to give the
+          phone a built-in toy — Nokia didn&apos;t expect it to become
+          synonymous with the brand. By 2005, Snake had been played on more
+          than 350 million phones. Probably the most widely-installed game
+          ever shipped.
+        </p>
+
+        <h2>The Nokia version&apos;s genius</h2>
+        <p>
+          Nokia&apos;s Snake nailed a few subtle design decisions:
+        </p>
+        <ul>
+          <li><strong>The food was always visible</strong> — no hunting, no luck.</li>
+          <li><strong>The snake wrapped around the screen edges</strong> in early versions, so you couldn&apos;t corner yourself by accident.</li>
+          <li><strong>Speed scaled with length</strong>, so the game got harder exactly as you started feeling confident.</li>
+          <li><strong>The d-pad was already in your hand.</strong> No new controls to learn.</li>
+        </ul>
+
+        <h2>The mechanic is genuinely interesting</h2>
+        <p>
+          Beneath the simplicity is a real problem. As the snake grows, the
+          playable area shrinks. The game forces you to think about{" "}
+          <em>space allocation</em> — which paths you leave open for later.
+          A high-score Snake run requires you to plan a route that fills the
+          board <em>orderly</em>, like solving a Hamiltonian path.
+        </p>
+        <p>
+          The hard upper bound of skill is filling every cell except the
+          food without trapping yourself. Theoretical players approach a
+          deterministic &quot;perfect game&quot; — and a few AI bots have
+          actually solved it.
+        </p>
+
+        <h2>Modern Snake</h2>
+        <p>
+          Our <G slug="snake">Snake</G> is the canonical version: 20×20
+          grid, food spawns randomly in any empty cell, the snake grows by
+          one per food. Smooth movement, swipe support on mobile, particle
+          burst on food eaten, gradient body (head amber, tail forest green),
+          best-score tracking in localStorage. No frills, just the loop —
+          which is exactly what 350 million Nokia owners came for.
+        </p>
+
+        <h2>5 modern twists worth knowing</h2>
+        <ul>
+          <li><strong>Slither.io</strong> (2016) — massively-multiplayer Snake. You can collide with hundreds of other snakes.</li>
+          <li><strong>Achtung, die Kurve!</strong> (1995) — Snake with turning curves and gaps. Local multiplayer chaos.</li>
+          <li><strong>Crossy Road</strong> — not technically Snake but uses the same &quot;one input = one step&quot; design language.</li>
+          <li><strong>Powerline.io</strong> — modern .io clone with power-ups and dashes.</li>
+          <li><strong>Snake VR</strong> — the same game, but you&apos;re inside it. (Yes, this exists. Yes, it&apos;s as motion-sickness inducing as you&apos;d think.)</li>
+        </ul>
+
+        <p>
+          The mechanic has survived 50 years of game design fads. It&apos;ll
+          probably survive 50 more.
+        </p>
+      </>
+    ),
+  },
+
+  {
     slug: "best-free-puzzle-games-2026",
     title: "10 Best Free Puzzle Games to Play Online in 2026",
     description:

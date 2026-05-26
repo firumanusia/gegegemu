@@ -12,6 +12,7 @@ import { GamePlayer } from "@/components/GamePlayer";
 import { GameCard } from "@/components/GameCard";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ShareButtons } from "@/components/ShareButtons";
+import { GameRating } from "@/components/GameRating";
 import { SITE, absoluteUrl } from "@/lib/site";
 import { ExternalLink, Gamepad2, User, Tag } from "lucide-react";
 
@@ -231,7 +232,10 @@ export default async function GamePage({
               </>
             )}
           </div>
-          <ShareButtons url={gameUrl} title={game.title} slug={game.slug} />
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:justify-end">
+            <GameRating slug={game.slug} />
+            <ShareButtons url={gameUrl} title={game.title} slug={game.slug} />
+          </div>
         </div>
       </div>
 

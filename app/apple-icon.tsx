@@ -24,7 +24,7 @@ export default function AppleIcon() {
             display: "flex",
           }}
         >
-          ✦
+          g
         </div>
       </div>
     ),

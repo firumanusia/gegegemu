@@ -25,7 +25,7 @@ export default function Icon() {
             display: "flex",
           }}
         >
-          ✦
+          g
         </div>
       </div>
     ),

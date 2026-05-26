@@ -38,7 +38,7 @@ export async function GET() {
               color: "white",
             }}
           >
-            ✦
+            g
           </div>
           <div
             style={{
