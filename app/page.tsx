@@ -6,14 +6,46 @@ import {
   getAllCategories,
 } from "@/lib/games";
 import { GameGrid, FeaturedGrid } from "@/components/GameGrid";
+import { SITE, absoluteUrl } from "@/lib/site";
 
 export default function Home() {
   const all = getAllGames();
   const featured = getFeaturedGames();
   const categories = getAllCategories();
 
+  // ItemList for the featured row so Google can show rich results
+  const featuredLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `Featured games on ${SITE.name}`,
+    numberOfItems: featured.length,
+    itemListElement: featured.map((g, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: absoluteUrl(`/games/${g.slug}`),
+      name: g.title,
+    })),
+  };
+  // Organization schema reinforces brand
+  const orgLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE.name,
+    url: SITE.url,
+    description: SITE.description,
+    logo: absoluteUrl("/icon"),
+  };
+
   return (
     <div className="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-6 sm:py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(featuredLd) }}
+      />
       <section className="mb-10">
         <h1
           className="text-3xl font-semibold tracking-tight sm:text-5xl"
@@ -22,7 +54,8 @@ export default function Home() {
           What are you <span className="text-gradient">playing</span> today?
         </h1>
         <p className="mt-3 max-w-xl text-base text-[var(--color-muted)] sm:text-lg">
-          Hand-picked free mini games. No downloads, no sign-ups. Just press play.
+          Play {all.length}+ free mini games online — puzzles, arcade, racing,
+          shooter, strategy and more. No downloads, no sign-ups. Just press play.
         </p>
       </section>
 

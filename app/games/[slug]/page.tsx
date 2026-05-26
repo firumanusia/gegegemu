@@ -10,6 +10,7 @@ import {
 } from "@/lib/games";
 import { GamePlayer } from "@/components/GamePlayer";
 import { GameCard } from "@/components/GameCard";
+import { SITE, absoluteUrl } from "@/lib/site";
 import { ExternalLink, Gamepad2, User, Tag } from "lucide-react";
 
 export async function generateStaticParams() {
@@ -24,13 +25,46 @@ export async function generateMetadata({
   const { slug } = await params;
   const game = getGameBySlug(slug);
   if (!game) return {};
+
+  // Keyword-rich title — drives organic search for "play X online" intent.
+  const seoTitle = `Play ${game.title} Online Free — No Download`;
+  const seoDescription = `${game.description} Play ${game.title} free in your browser on ${SITE.name}. No downloads, no sign-ups.`;
+  const url = absoluteUrl(`/games/${game.slug}`);
+
   return {
-    title: game.title,
-    description: game.description,
+    title: seoTitle,
+    description: seoDescription,
+    keywords: [
+      `${game.title.toLowerCase()} online`,
+      `play ${game.title.toLowerCase()}`,
+      `${game.title.toLowerCase()} free`,
+      ...game.categories.map((c) => `${c} games`),
+      ...game.tags,
+      "browser game",
+      "html5 game",
+      "no download",
+    ],
+    alternates: { canonical: url },
     openGraph: {
-      title: `${game.title} · gegegemu`,
+      type: "website",
+      url,
+      title: `${game.title} — Play Free Online`,
       description: game.description,
-      images: [game.thumbnail],
+      siteName: SITE.name,
+      images: [
+        {
+          url: `/og/games/${game.slug}`,
+          width: 1200,
+          height: 630,
+          alt: game.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${game.title} — Play Free Online`,
+      description: game.description,
+      images: [`/og/games/${game.slug}`],
     },
   };
 }
@@ -52,6 +86,44 @@ export default async function GamePage({
     )
     .slice(0, 8);
 
+  // Structured data — VideoGame schema + breadcrumb. Rich snippets in Google.
+  const gameUrl = absoluteUrl(`/games/${game.slug}`);
+  const videoGameLd = {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    name: game.title,
+    description: game.description,
+    url: gameUrl,
+    image: absoluteUrl(game.thumbnail),
+    genre: game.categories,
+    gamePlatform: ["Web browser", "HTML5"],
+    applicationCategory: "Game",
+    operatingSystem: "Any",
+    author: { "@type": "Organization", name: game.author },
+    publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+    },
+    inLanguage: "en",
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE.url },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Games",
+        item: absoluteUrl("/games"),
+      },
+      { "@type": "ListItem", position: 3, name: game.title, item: gameUrl },
+    ],
+  };
+
   return (
     <div
       className="mx-auto w-full px-3 py-4 sm:px-6 sm:py-6"
@@ -65,6 +137,14 @@ export default async function GamePage({
         } as React.CSSProperties
       }
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoGameLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <GamePlayer
         src={resolveGamePath(game.path)}
         title={game.title}

@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
 import { getAllGames, searchGames } from "@/lib/games";
 import { GameGrid } from "@/components/GameGrid";
+import { SITE, absoluteUrl } from "@/lib/site";
 
-export const metadata = {
-  title: "Browse games",
+export const metadata: Metadata = {
+  title: "All Free Online Games — Browse the Catalog",
+  description: `Browse all ${getAllGames().length}+ free mini games at ${SITE.name}. Puzzles, arcade, racing, shooter, strategy and more. No downloads, no sign-ups.`,
+  alternates: { canonical: absoluteUrl("/games") },
+  openGraph: {
+    title: `All Free Online Games — ${SITE.name}`,
+    description: `Browse ${getAllGames().length}+ free browser games.`,
+    url: absoluteUrl("/games"),
+    siteName: SITE.name,
+    type: "website",
+  },
 };
 
 export default async function BrowsePage({
@@ -14,9 +25,7 @@ export default async function BrowsePage({
   let games = q ? searchGames(q) : getAllGames();
 
   if (sort === "new") {
-    games = [...games].sort((a, b) =>
-      b.addedAt.localeCompare(a.addedAt),
-    );
+    games = [...games].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
   } else if (sort === "popular") {
     games = [...games].sort((a, b) => Number(b.featured) - Number(a.featured));
   }
