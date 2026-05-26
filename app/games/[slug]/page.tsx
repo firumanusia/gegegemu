@@ -10,6 +10,8 @@ import {
 } from "@/lib/games";
 import { GamePlayer } from "@/components/GamePlayer";
 import { GameCard } from "@/components/GameCard";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ShareButtons } from "@/components/ShareButtons";
 import { SITE, absoluteUrl } from "@/lib/site";
 import { ExternalLink, Gamepad2, User, Tag } from "lucide-react";
 
@@ -86,6 +88,12 @@ export default async function GamePage({
     )
     .slice(0, 8);
 
+  // Prev/next within the full catalog (stable order = `getAllGames()`)
+  const all = getAllGames();
+  const idx = all.findIndex((g) => g.slug === game.slug);
+  const prev = idx > 0 ? all[idx - 1] : all[all.length - 1];
+  const next = idx < all.length - 1 ? all[idx + 1] : all[0];
+
   // Structured data — VideoGame schema + breadcrumb. Rich snippets in Google.
   const gameUrl = absoluteUrl(`/games/${game.slug}`);
   const videoGameLd = {
@@ -145,6 +153,28 @@ export default async function GamePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+
+      {/* On-page breadcrumb so users can climb back up easily — matches the JSON-LD */}
+      <div className="mx-auto w-full max-w-[1400px]">
+        <Breadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Games", href: "/games" },
+            ...(game.categories[0]
+              ? [
+                  {
+                    label:
+                      getCategoryBySlug(game.categories[0])?.name ??
+                      game.categories[0],
+                    href: `/categories/${game.categories[0]}`,
+                  },
+                ]
+              : []),
+            { label: game.title },
+          ]}
+        />
+      </div>
+
       <GamePlayer
         src={resolveGamePath(game.path)}
         slug={game.slug}
@@ -182,23 +212,26 @@ export default async function GamePage({
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
-          <MetaPill icon={<Gamepad2 className="h-3.5 w-3.5" />} text={game.controls} />
-          {!isFirstParty(game.author) && (
-            <>
-              <MetaPill icon={<User className="h-3.5 w-3.5" />} text={game.author} />
-              <MetaPill icon={<Tag className="h-3.5 w-3.5" />} text={game.license} />
-              <a
-                href={game.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/60 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:border-[var(--color-accent)]"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Source
-              </a>
-            </>
-          )}
+        <div className="flex flex-col items-start gap-3 sm:shrink-0 sm:items-end">
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            <MetaPill icon={<Gamepad2 className="h-3.5 w-3.5" />} text={game.controls} />
+            {!isFirstParty(game.author) && (
+              <>
+                <MetaPill icon={<User className="h-3.5 w-3.5" />} text={game.author} />
+                <MetaPill icon={<Tag className="h-3.5 w-3.5" />} text={game.license} />
+                <a
+                  href={game.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/60 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:border-[var(--color-accent)]"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Source
+                </a>
+              </>
+            )}
+          </div>
+          <ShareButtons url={gameUrl} title={game.title} slug={game.slug} />
         </div>
       </div>
 
@@ -217,6 +250,35 @@ export default async function GamePage({
           </div>
         </section>
       )}
+
+      {/* Prev / next nav — gives Google + users another path through the catalog */}
+      <nav
+        aria-label="Game pagination"
+        className="mx-auto mt-10 grid w-full max-w-[1400px] grid-cols-1 gap-3 sm:grid-cols-2"
+      >
+        <Link
+          href={`/games/${prev.slug}`}
+          rel="prev"
+          className="group flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/60 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-[var(--color-accent)]"
+        >
+          <span className="text-2xl text-[var(--color-muted)] group-hover:text-[var(--color-accent)]">←</span>
+          <span className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--color-muted)]">Previous</span>
+            <span className="font-semibold text-white truncate">{prev.title}</span>
+          </span>
+        </Link>
+        <Link
+          href={`/games/${next.slug}`}
+          rel="next"
+          className="group flex items-center justify-end gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/60 px-4 py-3 text-right transition-all hover:-translate-y-0.5 hover:border-[var(--color-accent)]"
+        >
+          <span className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--color-muted)]">Next</span>
+            <span className="font-semibold text-white truncate">{next.title}</span>
+          </span>
+          <span className="text-2xl text-[var(--color-muted)] group-hover:text-[var(--color-accent)]">→</span>
+        </Link>
+      </nav>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   getGamesByCategory,
 } from "@/lib/games";
 import { GameGrid } from "@/components/GameGrid";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { SITE, absoluteUrl } from "@/lib/site";
 
 export async function generateStaticParams() {
@@ -97,6 +98,12 @@ export default async function CategoryPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: `${cat.name} games` },
+        ]}
       />
       <h1
         className="mb-2 text-2xl font-semibold sm:text-3xl"

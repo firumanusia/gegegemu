@@ -80,10 +80,50 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <main className="flex-1 min-w-0">{children}</main>
 
-        <footer className="mt-12 border-t border-[var(--color-border)] px-6 py-8 text-xs text-[var(--color-muted)]">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 sm:flex-row">
-            <p>© {new Date().getFullYear()} gegegemu. All games belong to their respective authors.</p>
-            <p>Built with Next.js · Hosted on Vercel + Cloudflare</p>
+        <footer className="mt-12 border-t border-[var(--color-border)] px-6 py-10 text-xs text-[var(--color-muted)]">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+              <div>
+                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-white">Play</h3>
+                <ul className="space-y-2">
+                  <li><a className="hover:text-[var(--color-accent)]" href="/">Home</a></li>
+                  <li><a className="hover:text-[var(--color-accent)]" href="/games">All games</a></li>
+                  <li><a className="hover:text-[var(--color-accent)]" href="/games?sort=new">New</a></li>
+                  <li><a className="hover:text-[var(--color-accent)]" href="/games?sort=popular">Popular</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-white">Categories</h3>
+                <ul className="space-y-2">
+                  {categories.slice(0, 6).map((cat) => (
+                    <li key={cat.slug}>
+                      <a className="hover:text-[var(--color-accent)]" href={`/categories/${cat.slug}`}>
+                        {cat.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-white">Site</h3>
+                <ul className="space-y-2">
+                  <li><a className="hover:text-[var(--color-accent)]" href="/about">About</a></li>
+                  <li><a className="hover:text-[var(--color-accent)]" href="/contact">Contact</a></li>
+                  <li><a className="hover:text-[var(--color-accent)]" href="/sitemap.xml">Sitemap</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-white">Legal</h3>
+                <ul className="space-y-2">
+                  <li><a className="hover:text-[var(--color-accent)]" href="/privacy">Privacy</a></li>
+                  <li><a className="hover:text-[var(--color-accent)]" href="/terms">Terms</a></li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-[var(--color-border)] pt-6 sm:flex-row">
+              <p>© {new Date().getFullYear()} gegegemu. All games belong to their respective authors.</p>
+              <p>No downloads · No sign-ups · Just press play</p>
+            </div>
           </div>
         </footer>
       </div>
