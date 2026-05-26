@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Color Rush</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:radial-gradient(ellipse 80% 60% at 50% 10%,rgba(255,107,53,.18),transparent 60%),
+               linear-gradient(180deg,#020617,#0b1224);
+    display:flex;align-items:center;justify-content:center;padding:12px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  canvas{border-radius:14px;border:1px solid #1e293b;background:transparent;display:block;touch-action:manipulation}
+  .hud{position:fixed;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:5}
+  .pill{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:999px;padding:6px 16px;font-size:18px;font-weight:700;backdrop-filter:blur(8px);color:#ffb627}
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.7);backdrop-filter:blur(8px);z-index:10}
+  .card{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:28px;max-width:320px;text-align:center}
+  h1{margin:0 0 8px;font-size:32px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 18px;color:#94a3b8;font-size:14px}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:12px 28px;border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c" width="360" height="640"></canvas>
+<div class="hud"><span class="pill" id="score">0</span></div>
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h1 id="title">Color Rush</h1>
+    <p id="msg">Tap, click, or press Space to spin the wheel. Match the falling ball's color before it hits.</p>
+    <button class="btn" id="btn">Start</button>
+  </div>
+</div>
+<script>
+(() => {
+  const cv = document.getElementById('c'); const ctx = cv.getContext('2d');
+  const W = 360, H = 640;
+  const overlay = document.getElementById('overlay'), titleEl=document.getElementById('title'), msgEl=document.getElementById('msg'), btn=document.getElementById('btn');
+  const scoreEl = document.getElementById('score');
+
+  const COLORS = ['#ff6b35','#ffb627','#22c55e','#3b82f6'];
+  const cx = W/2, cy = H - 130, R = 80;
+  let angle = 0, targetAngle = 0;
+  let ball, score, speed, alive, raf, sparks=[];
+
+  function reset(){
+    angle = 0; targetAngle = 0; score = 0; speed = 1.4;
+    alive = true; sparks = [];
+    spawnBall();
+    updateScore();
+  }
+  function spawnBall(){
+    ball = { x: cx, y: -20, color: COLORS[(Math.random()*COLORS.length)|0] };
+  }
+  function updateScore(){ scoreEl.textContent = score; }
+  function rotate(){ targetAngle += Math.PI/2; }
+  function colorAtTop(){
+    // 4 quadrants of wheel: top sector index based on angle
+    const idx = ((Math.round(-angle / (Math.PI/2)) % 4) + 4) % 4;
+    return COLORS[idx];
+  }
+  function loop(){
+    if (!alive) return;
+    angle += (targetAngle - angle) * 0.18;
+    ball.y += speed;
+    // collision when ball reaches wheel top
+    if (ball.y >= cy - R) {
+      if (ball.color === colorAtTop()) {
+        score++; speed = Math.min(5, speed + 0.07);
+        burst(cx, cy - R, ball.color);
+        spawnBall(); updateScore();
+      } else {
+        burst(cx, cy - R, '#ef4444');
+        gameover();
+        return;
+      }
+    }
+    sparks.forEach(s => { s.x+=s.vx; s.y+=s.vy; s.vy += 0.12; s.life -= 0.04; });
+    sparks = sparks.filter(s => s.life > 0);
+    draw();
+    raf = requestAnimationFrame(loop);
+  }
+  function burst(x,y,color){
+    for (let i=0;i<14;i++){
+      const a = Math.random()*Math.PI*2, s = 1+Math.random()*3.5;
+      sparks.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color});
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // wheel sectors
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(angle);
+    for (let i=0;i<4;i++){
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0, 0, R, -Math.PI/2 - Math.PI/4 + i*Math.PI/2, -Math.PI/2 + Math.PI/4 + i*Math.PI/2);
+      ctx.closePath();
+      ctx.fillStyle = COLORS[i]; ctx.fill();
+    }
+    // center
+    ctx.beginPath(); ctx.arc(0,0,18,0,Math.PI*2);
+    ctx.fillStyle = '#0f172a'; ctx.fill();
+    ctx.restore();
+    // indicator arrow (above the wheel, pointing down)
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - R - 12); ctx.lineTo(cx-10, cy - R - 28); ctx.lineTo(cx+10, cy - R - 28);
+    ctx.closePath(); ctx.fill();
+    // ball
+    ctx.shadowColor = ball.color; ctx.shadowBlur = 16;
+    ctx.fillStyle = ball.color; ctx.beginPath(); ctx.arc(ball.x, ball.y, 14, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    // sparks
+    sparks.forEach(s => { ctx.fillStyle = s.color; ctx.globalAlpha = s.life; ctx.fillRect(s.x-2,s.y-2,4,4); });
+    ctx.globalAlpha = 1;
+  }
+  function gameover(){
+    alive = false; cancelAnimationFrame(raf);
+    const best = +localStorage.getItem('colorrush_best') || 0;
+    if (score > best) localStorage.setItem('colorrush_best', score);
+    titleEl.textContent = 'Miss!';
+    msgEl.textContent = `Score: ${score} · Best: ${Math.max(best,score)}`;
+    btn.textContent = 'Play again';
+    setTimeout(()=>{ draw(); overlay.style.display='flex'; }, 250);
+  }
+  function start(){ overlay.style.display='none'; reset(); loop(); }
+  btn.addEventListener('click', start);
+  addEventListener('pointerdown', e => { if (e.target === btn || e.target.closest('.card')) return; rotate(); });
+  addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'ArrowRight'){ e.preventDefault(); rotate(); } });
+})();
+</script>
+</body>
+</html>

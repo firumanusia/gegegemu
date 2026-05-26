@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Lights Out</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,107,53,.15),transparent 60%),
+               linear-gradient(180deg,#020617,#0b1224);
+    display:flex;align-items:center;justify-content:center;padding:14px;user-select:none;-webkit-user-select:none}
+  .wrap{display:flex;flex-direction:column;gap:14px;width:100%;max-width:420px}
+  .hud{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .pill{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}
+  .moves{color:#ffb627}.best{color:#22c55e}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;aspect-ratio:1}
+  .cell{aspect-ratio:1;border-radius:16px;cursor:pointer;border:1px solid #1e293b;background:rgba(15,23,42,.5);transition:all .2s}
+  .cell.on{background:radial-gradient(circle at 35% 30%,#ffe27a,#ffb627 50%,#ff6b35);box-shadow:0 0 28px rgba(255,182,39,.7);border-color:transparent}
+  .cell:active{transform:scale(.94)}
+  p{margin:0;font-size:13px;color:#94a3b8;text-align:center}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:10px 22px;border-radius:999px;cursor:pointer;align-self:center}
+  .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.7);backdrop-filter:blur(8px);z-index:10}
+  .overlay.show{display:flex}
+  .card{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:28px;max-width:320px;text-align:center}
+  h1{margin:0 0 8px;font-size:30px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="pill moves">🎯 Moves: <span id="moves">0</span></div>
+    <div class="pill best">Best: <span id="best">—</span></div>
+    <button class="btn" id="new" style="padding:6px 14px;font-size:13px;align-self:auto">New</button>
+  </div>
+  <p>Click a cell to toggle it and its neighbors. Turn all lights off.</p>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="overlay" id="overlay"><div class="card"><h1>Cleared!</h1><p id="result"></p><br><button class="btn" id="again">Play again</button></div></div>
+<script>
+(() => {
+  const N = 5;
+  const grid = document.getElementById('grid');
+  const movesEl = document.getElementById('moves'), bestEl = document.getElementById('best');
+  const overlay = document.getElementById('overlay'), resultEl = document.getElementById('result');
+  let cells, moves;
+
+  function build(){
+    moves = 0; movesEl.textContent = 0;
+    cells = Array(N*N).fill(false);
+    // start from solved board, do random toggles to ensure solvable
+    const k = 6 + ((Math.random()*8)|0);
+    for (let i=0;i<k;i++){
+      const r = (Math.random()*N)|0, c = (Math.random()*N)|0;
+      toggle(r, c, true);
+    }
+    render();
+    updateBest();
+  }
+  function updateBest(){
+    const b = +localStorage.getItem('lightsout_best');
+    bestEl.textContent = b > 0 ? b : '—';
+  }
+  function toggle(r, c, silent){
+    const idx = r*N + c;
+    cells[idx] = !cells[idx];
+    if (r>0) cells[(r-1)*N+c] = !cells[(r-1)*N+c];
+    if (r<N-1) cells[(r+1)*N+c] = !cells[(r+1)*N+c];
+    if (c>0) cells[r*N+(c-1)] = !cells[r*N+(c-1)];
+    if (c<N-1) cells[r*N+(c+1)] = !cells[r*N+(c+1)];
+    if (!silent){
+      moves++; movesEl.textContent = moves;
+      render();
+      if (cells.every(x => !x)) win();
+    }
+  }
+  function win(){
+    const best = +localStorage.getItem('lightsout_best') || Infinity;
+    if (moves < best){ localStorage.setItem('lightsout_best', moves); }
+    updateBest();
+    resultEl.textContent = `${moves} moves`;
+    setTimeout(()=> overlay.classList.add('show'), 300);
+  }
+  function render(){
+    grid.innerHTML='';
+    for (let i=0;i<N*N;i++){
+      const el = document.createElement('div'); el.className='cell' + (cells[i]?' on':'');
+      const r = (i/N)|0, c = i%N;
+      el.addEventListener('click', () => toggle(r,c,false));
+      grid.appendChild(el);
+    }
+  }
+  document.getElementById('new').addEventListener('click', build);
+  document.getElementById('again').addEventListener('click', () => { overlay.classList.remove('show'); build(); });
+  build();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Minesweeper</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(255,107,53,.15),transparent 60%),
+               linear-gradient(180deg,#020617,#0b1224);
+    display:flex;align-items:center;justify-content:center;padding:12px;user-select:none;-webkit-user-select:none}
+  .wrap{display:flex;flex-direction:column;gap:12px;max-width:100%}
+  .hud{display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .pill{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}
+  .mines{color:#ef4444}.time{color:#ffb627}
+  button.reset{border:0;background:rgba(15,23,42,.7);border:1px solid #1e293b;color:#fff;padding:6px 14px;border-radius:999px;cursor:pointer;font-size:13px}
+  .grid{display:grid;gap:2px;background:#1e293b;padding:2px;border-radius:8px}
+  .cell{width:30px;height:30px;background:#475569;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer;border-radius:3px;transition:transform .05s}
+  .cell:hover:not(.open){background:#64748b}
+  .cell.open{background:#94a3b8;color:#0f172a;cursor:default}
+  .cell.flag{background:#fb923c}
+  .cell.mine{background:#ef4444;color:#fff}
+  .c1{color:#3b82f6}.c2{color:#22c55e}.c3{color:#ef4444}.c4{color:#7c3aed}.c5{color:#b91c1c}.c6{color:#0891b2}.c7{color:#000}.c8{color:#475569}
+  .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.7);backdrop-filter:blur(8px);z-index:10}
+  .overlay.show{display:flex}
+  .modal{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:28px;text-align:center;max-width:320px}
+  h1{margin:0 0 8px;font-size:30px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 18px;color:#94a3b8;font-size:14px}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:12px 28px;border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="pill mines">💣 <span id="mines">10</span></div>
+    <button class="reset" id="reset">↻ New game</button>
+    <div class="pill time">⏱ <span id="time">0</span>s</div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p style="margin:0;color:#94a3b8;font-size:12px;text-align:center">Left click reveal · Right click (or long-press) flag</p>
+</div>
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h1 id="title">Boom!</h1>
+    <p id="msg"></p>
+    <button class="btn" id="again">Play again</button>
+  </div>
+</div>
+<script>
+(() => {
+  const ROWS=9, COLS=9, MINES=10;
+  const gridEl = document.getElementById('grid');
+  gridEl.style.gridTemplateColumns = `repeat(${COLS}, 30px)`;
+  const minesEl = document.getElementById('mines'), timeEl = document.getElementById('time');
+  const overlay = document.getElementById('overlay'), titleEl = document.getElementById('title'), msgEl = document.getElementById('msg');
+  let board, opened, flagged, alive, won, t0, timer, flags;
+
+  function build(){
+    board = Array.from({length:ROWS}, () => Array.from({length:COLS}, () => ({mine:false, n:0})));
+    // place mines
+    let placed=0;
+    while (placed < MINES){
+      const r=(Math.random()*ROWS)|0, c=(Math.random()*COLS)|0;
+      if (!board[r][c].mine){ board[r][c].mine=true; placed++; }
+    }
+    // counts
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      if (board[r][c].mine) continue;
+      let n=0;
+      for (let dr=-1;dr<=1;dr++) for (let dc=-1;dc<=1;dc++) {
+        const nr=r+dr, nc=c+dc;
+        if (nr>=0&&nr<ROWS&&nc>=0&&nc<COLS && board[nr][nc].mine) n++;
+      }
+      board[r][c].n = n;
+    }
+    opened = Array.from({length:ROWS}, () => Array(COLS).fill(false));
+    flagged = Array.from({length:ROWS}, () => Array(COLS).fill(false));
+    alive = true; won = false; flags = 0;
+    minesEl.textContent = MINES - flags;
+    timeEl.textContent = 0; clearInterval(timer); t0 = null;
+    render();
+  }
+  function startTimer(){ if (timer) return; t0 = Date.now();
+    timer = setInterval(() => timeEl.textContent = Math.floor((Date.now()-t0)/1000), 250);
+  }
+  function revealInner(r,c){
+    if (!alive || opened[r][c] || flagged[r][c]) return;
+    opened[r][c] = true;
+    if (board[r][c].mine){ alive = false; return true; }
+    if (board[r][c].n === 0) {
+      for (let dr=-1;dr<=1;dr++) for (let dc=-1;dc<=1;dc++) {
+        const nr=r+dr, nc=c+dc;
+        if (nr>=0&&nr<ROWS&&nc>=0&&nc<COLS && !(dr===0&&dc===0)) revealInner(nr,nc);
+      }
+    }
+    return false;
+  }
+  function reveal(r,c){
+    if (!alive || opened[r][c] || flagged[r][c]) return;
+    if (!t0) startTimer();
+    const hitMine = revealInner(r,c);
+    if (hitMine){ lose(); return; }
+    render();
+    checkWin();
+  }
+  function flag(r,c){
+    if (!alive || opened[r][c]) return;
+    flagged[r][c] = !flagged[r][c];
+    flags += flagged[r][c] ? 1 : -1;
+    minesEl.textContent = MINES - flags;
+    render();
+  }
+  function checkWin(){
+    let safe=0;
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) if (!board[r][c].mine && opened[r][c]) safe++;
+    if (safe === ROWS*COLS - MINES) { won = true; alive = false; win(); }
+  }
+  function lose(){
+    clearInterval(timer);
+    titleEl.textContent='Boom!'; msgEl.textContent=`You hit a mine.`; overlay.classList.add('show');
+    render();
+  }
+  function win(){
+    clearInterval(timer);
+    titleEl.textContent='Cleared!'; msgEl.textContent=`Solved in ${timeEl.textContent}s.`; overlay.classList.add('show');
+    render();
+  }
+  function render(){
+    gridEl.innerHTML='';
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const cellData = board[r][c];
+      if (opened[r][c]) {
+        cell.classList.add('open');
+        if (cellData.mine) { cell.classList.add('mine'); cell.textContent = '💣'; }
+        else if (cellData.n > 0) { cell.classList.add('c'+cellData.n); cell.textContent = cellData.n; }
+      } else if (flagged[r][c]) {
+        cell.classList.add('flag'); cell.textContent = '🚩';
+      } else if (!alive && cellData.mine) {
+        cell.classList.add('mine'); cell.textContent = '💣';
+      }
+      let longPressTimer;
+      cell.addEventListener('click', () => reveal(r,c));
+      cell.addEventListener('contextmenu', e => { e.preventDefault(); flag(r,c); });
+      cell.addEventListener('touchstart', () => { longPressTimer = setTimeout(() => { flag(r,c); longPressTimer = null; }, 350); }, {passive:true});
+      cell.addEventListener('touchend', e => { if (longPressTimer) { clearTimeout(longPressTimer); reveal(r,c); } e.preventDefault(); });
+      gridEl.appendChild(cell);
+    }
+  }
+  document.getElementById('reset').addEventListener('click', () => { overlay.classList.remove('show'); build(); });
+  document.getElementById('again').addEventListener('click', () => { overlay.classList.remove('show'); build(); });
+  build();
+})();
+</script>
+</body>
+</html>

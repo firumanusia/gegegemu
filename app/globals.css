@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #020617;
+  --color-bg-gradient: #0b1224;
+  --color-surface: #0f172a;
+  --color-surface-2: #111c33;
+  --color-border: #1e293b;
+  --color-text: #f1f5f9;
+  --color-muted: #94a3b8;
+  --color-accent: #ff6b35;
+  --color-accent-2: #ffb627;
+
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-feature: 16px;
+}
+
+@layer base {
+  html,
+  body {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(255, 107, 53, 0.08), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 80% 10%, rgba(255, 182, 39, 0.06), transparent 60%),
+      linear-gradient(180deg, #020617 0%, #0b1224 100%);
+    background-attachment: fixed;
+    color: var(--color-text);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: white;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.25);
+    border-radius: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

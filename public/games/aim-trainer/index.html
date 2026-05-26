@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Aim Trainer</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(255,107,53,.15),transparent 60%),
+               linear-gradient(180deg,#020617,#0b1224);
+    user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  #stage{position:relative;width:100%;height:100%;cursor:crosshair}
+  .hud{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;z-index:5}
+  .pill{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;backdrop-filter:blur(8px)}
+  .score{color:#ffb627}.time{color:#ff6b35}.acc{color:#22c55e}
+  .target{position:absolute;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);
+    background:radial-gradient(circle,#fff 0%,#ffb627 30%,#ff6b35 65%,transparent 78%);
+    box-shadow:0 0 24px rgba(255,182,39,.7);animation:pop .2s ease-out}
+  .target.miss{background:radial-gradient(circle,#fff 0%,#94a3b8 30%,#475569 65%,transparent 78%);box-shadow:0 0 16px rgba(148,163,184,.5)}
+  @keyframes pop{from{transform:translate(-50%,-50%) scale(0)}to{transform:translate(-50%,-50%) scale(1)}}
+  .hit{position:absolute;font-weight:800;color:#ffb627;font-size:22px;pointer-events:none;transform:translate(-50%,-50%);animation:rise .8s ease-out forwards}
+  @keyframes rise{from{opacity:1;transform:translate(-50%,-50%)}to{opacity:0;transform:translate(-50%,-160%) scale(1.4)}}
+  .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.7);backdrop-filter:blur(8px);z-index:10}
+  .card{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:28px;text-align:center;max-width:320px}
+  h1{margin:0 0 8px;font-size:32px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 18px;color:#94a3b8;font-size:14px}
+  .stat{display:flex;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+  .stat .b{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);padding:6px 12px;border-radius:8px;font-size:13px}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:12px 28px;border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="hud">
+    <div class="pill score">🎯 <span id="score">0</span></div>
+    <div class="pill acc"><span id="acc">100</span>%</div>
+    <div class="pill time">⏱ <span id="time">30</span>s</div>
+  </div>
+  <div class="overlay" id="overlay">
+    <div class="card">
+      <h1 id="title">Aim Trainer</h1>
+      <p id="msg">Click as many targets as you can in 30 seconds.<br>Don't miss — accuracy matters.</p>
+      <button class="btn" id="btn">Start</button>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const overlay = document.getElementById('overlay');
+  const titleEl = document.getElementById('title'), msgEl = document.getElementById('msg'), btn = document.getElementById('btn');
+  const scoreEl = document.getElementById('score'), timeEl = document.getElementById('time'), accEl = document.getElementById('acc');
+
+  let hits, clicks, timeLeft, running, current, spawnT, timerT, bestKey='aim_best';
+  function spawn(){
+    if (current) current.remove();
+    const r = 28 + Math.random()*22;
+    const pad = r + 20;
+    const w = stage.clientWidth, h = stage.clientHeight;
+    const x = pad + Math.random()*(w - pad*2);
+    const y = pad + 60 + Math.random()*(h - pad*2 - 60);
+    const el = document.createElement('div');
+    el.className = 'target';
+    el.style.width = el.style.height = (r*2)+'px';
+    el.style.left = x+'px'; el.style.top = y+'px';
+    el.addEventListener('pointerdown', e => { e.stopPropagation(); if (!running) return; hits++; updateScore(); pop(x,y); el.remove(); current=null; spawn(); });
+    stage.appendChild(el); current = el;
+    clearTimeout(spawnT);
+    spawnT = setTimeout(() => { if (running && current === el){ el.classList.add('miss'); setTimeout(()=>{el.remove();}, 200); current=null; spawn(); } }, 1300);
+  }
+  function pop(x,y){
+    const t = document.createElement('div'); t.className='hit'; t.textContent='+1';
+    t.style.left=x+'px'; t.style.top=y+'px';
+    stage.appendChild(t); setTimeout(()=>t.remove(), 800);
+  }
+  function updateScore(){
+    scoreEl.textContent = hits;
+    const a = clicks ? Math.round(hits/clicks*100) : 100;
+    accEl.textContent = a;
+  }
+  function start(){
+    hits = 0; clicks = 0; timeLeft = 30; running = true;
+    scoreEl.textContent = 0; timeEl.textContent = 30; accEl.textContent = 100;
+    overlay.style.display = 'none';
+    [...stage.querySelectorAll('.target,.hit')].forEach(e=>e.remove());
+    spawn();
+    timerT = setInterval(()=>{ timeLeft--; timeEl.textContent = timeLeft; if (timeLeft<=0) end(); }, 1000);
+  }
+  function end(){
+    running = false; clearInterval(timerT); clearTimeout(spawnT);
+    if (current){ current.remove(); current=null; }
+    const best = +localStorage.getItem(bestKey) || 0;
+    if (hits > best) localStorage.setItem(bestKey, hits);
+    titleEl.textContent = "Time's up!";
+    msgEl.innerHTML = `<div class="stat"><div class="b">Hits: <b>${hits}</b></div><div class="b">Accuracy: <b>${accEl.textContent}%</b></div><div class="b">Best: <b>${Math.max(best,hits)}</b></div></div>`;
+    btn.textContent = 'Play again';
+    overlay.style.display = 'flex';
+  }
+  stage.addEventListener('pointerdown', e => {
+    if (!running) return;
+    if (e.target.classList.contains('target')) return;
+    clicks++; updateScore();
+  });
+  // count target hits in clicks too
+  stage.addEventListener('pointerdown', e => {
+    if (running && e.target.classList.contains('target')) clicks++;
+  }, true);
+  btn.addEventListener('click', start);
+})();
+</script>
+</body>
+</html>

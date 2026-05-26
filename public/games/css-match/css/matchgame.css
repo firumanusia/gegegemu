@@ -1,0 +1,294 @@
+/* Color Match — modern redesign
+ * Original game logic and HTML structure © 2010 Thomas Seng Hin Mak (MIT-licensed).
+ * UI styling rewritten 2026 for gegegemu.
+ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", "Inter", sans-serif;
+  color: #f1f5f9;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% -10%, rgba(255, 107, 53, 0.12), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 10%, rgba(255, 182, 39, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(124, 58, 237, 0.08), transparent 60%),
+    linear-gradient(180deg, #050818 0%, #0a0f24 100%);
+  background-attachment: fixed;
+  text-align: center;
+  padding: 20px 12px 40px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+header h1 {
+  margin: 8px 0 4px;
+  font-size: clamp(28px, 5vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ff6b35, #ffb627);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+#timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 18px;
+  padding: 8px 18px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #93a0c6;
+  backdrop-filter: blur(8px);
+  text-shadow: none;
+}
+#timer #elapsed-time {
+  color: #ffb627;
+  font-variant-numeric: tabular-nums;
+}
+#timer::before { content: "⏱"; }
+
+/* Game board */
+#game {
+  position: relative;
+  width: min(420px, calc(100vw - 24px));
+  height: min(540px, 130vw);
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01) 30%),
+    linear-gradient(180deg, rgba(22,29,58,0.7), rgba(15,21,46,0.7));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 60px -20px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#cards {
+  position: relative;
+  width: 380px;
+  height: 400px;
+  max-width: 100%;
+}
+
+.card {
+  perspective: 800px;
+  width: 80px;
+  height: 120px;
+  position: absolute;
+  cursor: pointer;
+  transition: transform .25s, opacity .35s;
+}
+
+.card:hover { transform: translateY(-3px); }
+
+.face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  transition: transform .35s cubic-bezier(.2,.7,.3,1.2), box-shadow .25s, opacity .35s;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Face-down side (front in original markup, shown by default) */
+.front {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(160deg, #2a3162 0%, #1a2042 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10) inset,
+    0 6px 14px -6px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+.front::after {
+  content: "?";
+  font-size: 32px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.04em;
+}
+
+/* Face-up side (back in original markup, shown when flipped) */
+.back {
+  transform: rotate3d(0, 1, 0, -180deg);
+  z-index: 8;
+  font-size: 38px;
+  color: white;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 6px 14px -6px rgba(0, 0, 0, 0.5);
+}
+.back::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 35%);
+  pointer-events: none;
+}
+
+.card:hover .face {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 14px 30px -10px rgba(255, 107, 53, 0.45);
+}
+
+/* Flip animation */
+.card-flipped .front { transform: rotate3d(0, 1, 0, 180deg); z-index: 8; }
+.card-flipped .back  { transform: rotate3d(0, 1, 0, 0deg);   z-index: 10; }
+
+.card-removed { opacity: 0; transform: scale(.85); pointer-events: none; }
+
+/* The 6 pair patterns — each gets a unique gradient + symbol on the back face.
+ * Original card classes (cardAJ, cardAQ, cardAK, cardBJ, cardBQ, cardBK) are kept
+ * because the JS uses them as data identifiers; only the visual mapping is new.
+ */
+.cardAJ { background: linear-gradient(135deg, #ff6b35, #c2410c); }
+.cardAJ::after { content: "🔥"; position: relative; z-index: 1; }
+
+.cardAQ { background: linear-gradient(135deg, #ffb627, #b45309); }
+.cardAQ::after { content: "⭐"; position: relative; z-index: 1; }
+
+.cardAK { background: linear-gradient(135deg, #22c55e, #166534); }
+.cardAK::after { content: "🍃"; position: relative; z-index: 1; }
+
+.cardBJ { background: linear-gradient(135deg, #38bdf8, #0c4a6e); }
+.cardBJ::after { content: "💎"; position: relative; z-index: 1; }
+
+.cardBQ { background: linear-gradient(135deg, #a855f7, #581c87); }
+.cardBQ::after { content: "🎯"; position: relative; z-index: 1; }
+
+.cardBK { background: linear-gradient(135deg, #ec4899, #831843); }
+.cardBK::after { content: "🚀"; position: relative; z-index: 1; }
+
+/* Game-over popup */
+#popup {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  color: #f1f5f9;
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.7);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  transition: opacity .3s, visibility .3s;
+}
+
+#popup-bg { display: none; }
+
+#popup-box {
+  position: relative;
+  width: min(360px, calc(100vw - 32px));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(180deg, rgba(22, 29, 58, 0.95), rgba(15, 21, 46, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: 32px 28px 28px;
+  text-align: center;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
+}
+
+#popup-box h1 {
+  margin: 0 0 4px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ff6b35, #ffb627);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+#popup-box p {
+  margin: 6px 0;
+  color: #93a0c6;
+  text-shadow: none;
+}
+
+#popup-box p .score {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 16px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffb627;
+  background: rgba(255, 107, 53, 0.10);
+  border: 1px solid rgba(255, 107, 53, 0.30);
+  border-radius: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+#popup-box small {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #6b7896;
+  line-height: 1.6;
+}
+
+#popup-box small .last-score,
+#popup-box small .saved-time {
+  color: #93a0c6;
+}
+
+/* Hide popup */
+#popup.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* New-record ribbon */
+.ribbon.hide { display: none; }
+
+.ribbon {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.ribbon-body {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #ff6b35, #ffb627);
+  color: white;
+  border-radius: 999px;
+  box-shadow: 0 8px 22px -8px rgba(255, 107, 53, 0.55);
+  text-shadow: none;
+}
+
+.ribbon-body span::before { content: "✨ "; }
+
+.triangle { display: none; }

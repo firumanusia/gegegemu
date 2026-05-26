@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Paddle Duel</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:linear-gradient(180deg,#020617,#0b1224);
+    display:flex;align-items:center;justify-content:center;padding:12px;user-select:none;-webkit-user-select:none;touch-action:none}
+  canvas{width:100%;max-width:min(100%,calc(95vh*16/9));aspect-ratio:16/9;border-radius:14px;border:1px solid #1e293b;background:#020617;display:block;box-shadow:0 0 60px -20px rgba(255,107,53,.3)}
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.7);backdrop-filter:blur(8px);z-index:10}
+  .card{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:28px;max-width:340px;text-align:center}
+  h1{margin:0 0 8px;font-size:32px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 18px;color:#94a3b8;font-size:14px}
+  .row{display:flex;gap:10px;justify-content:center;margin-bottom:14px}
+  .row button{background:rgba(15,23,42,.7);border:1px solid #1e293b;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+  .row button.on{background:linear-gradient(135deg,#ff6b35,#ffb627);border-color:transparent}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:12px 28px;border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c" width="960" height="540"></canvas>
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h1 id="title">Paddle Duel</h1>
+    <p id="msg">First to 7 wins. W/S for left paddle. Arrows or AI for right.</p>
+    <div class="row" id="modes">
+      <button data-mode="ai" class="on">vs CPU</button>
+      <button data-mode="2p">2 player</button>
+    </div>
+    <button class="btn" id="btn">Play</button>
+  </div>
+</div>
+<script>
+(() => {
+  const cv = document.getElementById('c'); const ctx = cv.getContext('2d');
+  const overlay = document.getElementById('overlay'), titleEl = document.getElementById('title'), msgEl = document.getElementById('msg'), btn = document.getElementById('btn');
+  let mode = 'ai';
+  document.querySelectorAll('#modes button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#modes button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on'); mode = b.dataset.mode;
+  }));
+
+  const W=960, H=540, PAD_H=90, PAD_W=14, BALL=12, WIN=7;
+  let left, right, ball, score, keys={}, running=false, trail=[], sparks=[];
+
+  function reset(serveTo=Math.random()<0.5?-1:1){
+    left = H/2; right = H/2;
+    ball = { x:W/2, y:H/2, vx: serveTo*5, vy: (Math.random()*2-1)*3 };
+    trail = [];
+  }
+  function start(){
+    score = {l:0,r:0}; reset(); overlay.style.display='none'; running=true; requestAnimationFrame(loop);
+  }
+  function burst(x, y, color){
+    for (let i=0;i<12;i++){
+      const a = Math.random()*Math.PI*2, s = 1.5 + Math.random()*3;
+      sparks.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life: 1, color });
+    }
+  }
+  function loop(){
+    if (!running) return;
+    if (keys['w']||keys['W']) left -= 7;
+    if (keys['s']||keys['S']) left += 7;
+    if (mode==='2p') {
+      if (keys['ArrowUp']) right -= 7;
+      if (keys['ArrowDown']) right += 7;
+    } else {
+      const target = ball.y - PAD_H/2; const diff = target - right;
+      right += Math.max(-5.5, Math.min(5.5, diff));
+    }
+    left = Math.max(0, Math.min(H-PAD_H, left));
+    right = Math.max(0, Math.min(H-PAD_H, right));
+
+    trail.push({x:ball.x, y:ball.y, life:1});
+    if (trail.length > 14) trail.shift();
+
+    ball.x += ball.vx; ball.y += ball.vy;
+    if (ball.y < BALL) { ball.y = BALL; ball.vy *= -1; burst(ball.x, ball.y, '#ffb627'); }
+    if (ball.y > H-BALL) { ball.y = H-BALL; ball.vy *= -1; burst(ball.x, ball.y, '#ffb627'); }
+    if (ball.x < 30 + PAD_W && ball.x > 30 && ball.y > left && ball.y < left+PAD_H) {
+      ball.x = 30 + PAD_W; ball.vx = Math.abs(ball.vx) * 1.05;
+      ball.vy += ((ball.y - (left+PAD_H/2))/PAD_H) * 6;
+      burst(ball.x, ball.y, '#ff6b35');
+    }
+    if (ball.x > W-30-PAD_W && ball.x < W-30 && ball.y > right && ball.y < right+PAD_H) {
+      ball.x = W-30-PAD_W; ball.vx = -Math.abs(ball.vx) * 1.05;
+      ball.vy += ((ball.y - (right+PAD_H/2))/PAD_H) * 6;
+      burst(ball.x, ball.y, '#ffb627');
+    }
+    ball.vx = Math.max(-12, Math.min(12, ball.vx));
+    if (ball.x < 0) { burst(0, ball.y, '#ef4444'); score.r++; if (score.r>=WIN) return end('Right'); reset(1); }
+    else if (ball.x > W) { burst(W, ball.y, '#ef4444'); score.l++; if (score.l>=WIN) return end('Left'); reset(-1); }
+
+    // sparks
+    sparks.forEach(s => { s.x += s.vx; s.y += s.vy; s.vx *= 0.94; s.vy *= 0.94; s.life -= 0.04; });
+    sparks = sparks.filter(s => s.life > 0);
+
+    draw();
+    requestAnimationFrame(loop);
+  }
+  function drawPaddle(x, y, color){
+    ctx.shadowColor = color; ctx.shadowBlur = 24;
+    ctx.fillStyle = color; ctx.fillRect(x, y, PAD_W, PAD_H);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,.3)';
+    ctx.fillRect(x, y, PAD_W, 4);
+  }
+  function draw(){
+    ctx.fillStyle='#020617'; ctx.fillRect(0,0,W,H);
+    // glow center line
+    ctx.strokeStyle='rgba(255,107,53,.18)'; ctx.setLineDash([14,14]); ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke(); ctx.setLineDash([]);
+    // scores
+    ctx.font='bold 72px system-ui'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(255,107,53,.18)'; ctx.fillText(score.l, W/2 - 100, 100);
+    ctx.fillStyle='rgba(255,182,39,.18)'; ctx.fillText(score.r, W/2 + 100, 100);
+    // trail
+    trail.forEach((t,i) => {
+      const a = (i/trail.length) * 0.5;
+      ctx.fillStyle = `rgba(255,182,39,${a})`;
+      ctx.beginPath(); ctx.arc(t.x, t.y, BALL * (i/trail.length), 0, Math.PI*2); ctx.fill();
+    });
+    // paddles + ball
+    drawPaddle(30, left, '#ff6b35');
+    drawPaddle(W-30-PAD_W, right, '#ffb627');
+    ctx.shadowColor = '#fff'; ctx.shadowBlur = 16;
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(ball.x, ball.y, BALL/1.5, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    // sparks
+    sparks.forEach(s => {
+      ctx.fillStyle = s.color; ctx.globalAlpha = s.life;
+      ctx.fillRect(s.x-2, s.y-2, 4, 4);
+    });
+    ctx.globalAlpha = 1;
+  }
+  function end(winner){
+    running=false;
+    titleEl.textContent = `${winner} wins!`;
+    msgEl.textContent = `${score.l} – ${score.r}`;
+    btn.textContent = 'Play again'; overlay.style.display='flex';
+  }
+  btn.addEventListener('click', start);
+
+  addEventListener('keydown', e => { keys[e.key]=true; if (['ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault(); });
+  addEventListener('keyup', e => { keys[e.key]=false; });
+  cv.addEventListener('touchmove', e => {
+    for (const t of e.touches) {
+      const rect = cv.getBoundingClientRect();
+      const y = (t.clientY - rect.top) / rect.height * H - PAD_H/2;
+      if (t.clientX < rect.left + rect.width/2) left = Math.max(0, Math.min(H-PAD_H, y));
+      else if (mode==='2p') right = Math.max(0, Math.min(H-PAD_H, y));
+    }
+    e.preventDefault();
+  }, {passive:false});
+
+  reset(); draw();
+})();
+</script>
+</body>
+</html>

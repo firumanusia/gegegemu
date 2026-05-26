@@ -1,0 +1,677 @@
+[
+  {
+    "slug": "2048",
+    "title": "2048",
+    "description": "Slide numbered tiles to combine them. Reach the 2048 tile — or keep going for an even higher score.",
+    "thumbnail": "/thumbs/2048.svg",
+    "path": "/games/2048/index.html",
+    "categories": [
+      "puzzle",
+      "casual"
+    ],
+    "tags": [
+      "math",
+      "single-player"
+    ],
+    "controls": "Arrow keys (desktop) · Swipe (mobile)",
+    "sourceUrl": "https://github.com/gabrielecirulli/2048",
+    "license": "MIT",
+    "author": "Gabriele Cirulli",
+    "aspectRatio": "1:1",
+    "featured": true,
+    "addedAt": "2026-05-26"
+  },
+  {
+    "slug": "blockfall",
+    "title": "Blockfall",
+    "description": "Stack falling tetrominoes, clear lines, survive as long as you can. A classic falling-block puzzle.",
+    "thumbnail": "/thumbs/tetris.svg",
+    "path": "/games/blockfall/index.html",
+    "categories": [
+      "puzzle",
+      "arcade"
+    ],
+    "tags": [
+      "classic",
+      "single-player"
+    ],
+    "controls": "← → move · ↑ rotate · ↓ soft drop · Space hard drop",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "10:16",
+    "featured": true,
+    "addedAt": "2026-05-26"
+  },
+  {
+    "slug": "snake",
+    "title": "Snake",
+    "description": "Eat, grow, don't bite your tail. The arcade classic — smoother than ever.",
+    "thumbnail": "/thumbs/snake.svg",
+    "path": "/games/snake/index.html",
+    "categories": [
+      "arcade",
+      "casual"
+    ],
+    "tags": [
+      "retro",
+      "single-player"
+    ],
+    "controls": "Arrow keys or WASD · Swipe on mobile",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-26"
+  },
+  {
+    "slug": "memory",
+    "title": "Memory Match",
+    "description": "Flip cards two at a time and find the matching pairs. A classic test of focus.",
+    "thumbnail": "/thumbs/memory.svg",
+    "path": "/games/memory/index.html",
+    "categories": [
+      "puzzle",
+      "casual"
+    ],
+    "tags": [
+      "memory",
+      "kid-friendly"
+    ],
+    "controls": "Click / Tap",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-26"
+  },
+  {
+    "slug": "minesweeper",
+    "title": "Minesweeper",
+    "description": "Uncover safe tiles, flag the mines. Logic, luck, and a little bit of dread.",
+    "thumbnail": "/thumbs/minesweeper.svg",
+    "path": "/games/minesweeper/index.html",
+    "categories": [
+      "puzzle",
+      "strategy"
+    ],
+    "tags": [
+      "classic",
+      "single-player"
+    ],
+    "controls": "Left click reveal · Right click flag",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": true,
+    "addedAt": "2026-05-26"
+  },
+  {
+    "slug": "paddle-duel",
+    "title": "Paddle Duel",
+    "description": "Two paddles, one ball, one winner. Play the CPU or grab a friend.",
+    "thumbnail": "/thumbs/pong.svg",
+    "path": "/games/paddle-duel/index.html",
+    "categories": [
+      "arcade",
+      "sports"
+    ],
+    "tags": [
+      "retro",
+      "two-player"
+    ],
+    "controls": "W/S · Arrow keys",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "16:9",
+    "featured": false,
+    "addedAt": "2026-05-26"
+  },
+  {
+    "slug": "breakout",
+    "title": "Brick Break",
+    "description": "Smash every brick with the bouncing ball. Don't let it slip past.",
+    "thumbnail": "/thumbs/breakout.svg",
+    "path": "/games/breakout/index.html",
+    "categories": [
+      "arcade",
+      "action"
+    ],
+    "tags": [
+      "retro",
+      "single-player"
+    ],
+    "controls": "← → or Mouse",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "4:3",
+    "featured": false,
+    "addedAt": "2026-05-26"
+  },
+  {
+    "slug": "suika",
+    "title": "Fruit Drop",
+    "description": "Drop fruits and combine matching ones into bigger fruits. Don't let the pile reach the top.",
+    "thumbnail": "/thumbs/suika.svg",
+    "path": "/games/suika/index.html",
+    "categories": [
+      "puzzle",
+      "casual"
+    ],
+    "tags": [
+      "physics",
+      "merge",
+      "single-player"
+    ],
+    "controls": "Mouse to aim · Click to drop",
+    "sourceUrl": "https://github.com/moonfloof/suika-game",
+    "license": "Public Domain (Unlicense) + Matter.js MIT",
+    "author": "moonfloof",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "aim-trainer",
+    "title": "Aim Trainer",
+    "description": "Click as many targets as you can in 30 seconds. Train your reflexes, watch your accuracy.",
+    "thumbnail": "/thumbs/aim-trainer.svg",
+    "path": "/games/aim-trainer/index.html",
+    "categories": [
+      "arcade",
+      "casual"
+    ],
+    "tags": [
+      "reflex",
+      "single-player",
+      "speed"
+    ],
+    "controls": "Click / Tap targets",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "stacker",
+    "title": "Stacker",
+    "description": "Drop the moving block on top of the stack. Miss the line and it gets smaller. How tall can you build?",
+    "thumbnail": "/thumbs/stacker.svg",
+    "path": "/games/stacker/index.html",
+    "categories": [
+      "arcade",
+      "casual"
+    ],
+    "tags": [
+      "one-button",
+      "timing",
+      "single-player"
+    ],
+    "controls": "Click / Tap / Space",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "9:16",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "color-rush",
+    "title": "Color Rush",
+    "description": "Rotate the wheel to match the falling ball's color. One wrong slot and it's over.",
+    "thumbnail": "/thumbs/color-rush.svg",
+    "path": "/games/color-rush/index.html",
+    "categories": [
+      "arcade",
+      "casual"
+    ],
+    "tags": [
+      "one-button",
+      "color",
+      "single-player"
+    ],
+    "controls": "Click / Tap / Space",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "9:16",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "maze-muncher",
+    "title": "Maze Muncher",
+    "description": "Eat all the dots in the maze while avoiding the ghosts. Classic arcade chase.",
+    "thumbnail": "/thumbs/maze-muncher.svg",
+    "path": "/games/maze-muncher/index.html",
+    "categories": [
+      "arcade"
+    ],
+    "tags": [
+      "retro",
+      "maze",
+      "single-player"
+    ],
+    "controls": "Arrow keys",
+    "sourceUrl": "https://github.com/TomMalbran/games",
+    "license": "MIT",
+    "author": "Tomás Malbrán",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "spider",
+    "title": "Spider Solitaire",
+    "description": "The classic solitaire variant — clear all cards by building runs from King to Ace.",
+    "thumbnail": "/thumbs/spider.svg",
+    "path": "/games/spider/index.html",
+    "categories": [
+      "card",
+      "puzzle"
+    ],
+    "tags": [
+      "solitaire",
+      "cards",
+      "single-player"
+    ],
+    "controls": "Mouse / Touch",
+    "sourceUrl": "https://github.com/TomMalbran/games",
+    "license": "MIT",
+    "author": "Tomás Malbrán",
+    "aspectRatio": "4:3",
+    "featured": true,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "untangle",
+    "title": "Untangle",
+    "description": "Drag the nodes so no lines cross. Easy at first — gets brutal fast.",
+    "thumbnail": "/thumbs/untangle.svg",
+    "path": "/games/untangle/index.html",
+    "categories": [
+      "puzzle"
+    ],
+    "tags": [
+      "logic",
+      "single-player"
+    ],
+    "controls": "Drag the dots",
+    "sourceUrl": "https://github.com/makzan/HTML5-Games-Examples",
+    "license": "MIT",
+    "author": "Thomas Mak (makzan)",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "css-match",
+    "title": "Color Match",
+    "description": "Find and remove matching color blocks. A satisfying clear-the-grid loop.",
+    "thumbnail": "/thumbs/css-match.svg",
+    "path": "/games/css-match/index.html",
+    "categories": [
+      "puzzle",
+      "casual"
+    ],
+    "tags": [
+      "match-3",
+      "color",
+      "single-player"
+    ],
+    "controls": "Click / Tap",
+    "sourceUrl": "https://github.com/makzan/HTML5-Games-Examples",
+    "license": "MIT",
+    "author": "Thomas Mak (makzan)",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "whack-spark",
+    "title": "Whack-a-Spark",
+    "description": "Tap orange sparks fast. Avoid the red bombs. Three strikes and you're out.",
+    "thumbnail": "/thumbs/whack-spark.svg",
+    "path": "/games/whack-spark/index.html",
+    "categories": [
+      "arcade",
+      "casual"
+    ],
+    "tags": [
+      "reflex",
+      "single-player"
+    ],
+    "controls": "Click / Tap",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "tic-tac-toe",
+    "title": "Tic-Tac-Toe",
+    "description": "Three in a row. Pick easy for fun or hard for an unbeatable AI.",
+    "thumbnail": "/thumbs/tic-tac-toe.svg",
+    "path": "/games/tic-tac-toe/index.html",
+    "categories": [
+      "strategy",
+      "casual"
+    ],
+    "tags": [
+      "classic",
+      "vs-cpu"
+    ],
+    "controls": "Click / Tap",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "connect-four",
+    "title": "Connect Four",
+    "description": "Drop discs to get four in a row. Beat the CPU horizontally, vertically, or diagonally.",
+    "thumbnail": "/thumbs/connect-four.svg",
+    "path": "/games/connect-four/index.html",
+    "categories": [
+      "strategy",
+      "casual"
+    ],
+    "tags": [
+      "classic",
+      "vs-cpu"
+    ],
+    "controls": "Click / Tap a column",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "7:6",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "sliding-puzzle",
+    "title": "Sliding Puzzle",
+    "description": "Slide numbered tiles into order. Pick 3×3, 4×4, or 5×5.",
+    "thumbnail": "/thumbs/sliding-puzzle.svg",
+    "path": "/games/sliding-puzzle/index.html",
+    "categories": [
+      "puzzle"
+    ],
+    "tags": [
+      "classic",
+      "single-player"
+    ],
+    "controls": "Click / Tap tiles",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "little-puzzle",
+    "title": "Match Cascade",
+    "description": "Match-3 puzzle with HD rendering, satisfying cascades, and high-score tracking. Built with LittleJS.",
+    "thumbnail": "/thumbs/little-puzzle.svg",
+    "path": "/games/little-puzzle/index.html",
+    "categories": [
+      "puzzle",
+      "casual"
+    ],
+    "tags": [
+      "match-3",
+      "polished",
+      "single-player"
+    ],
+    "controls": "Click / Drag to swap",
+    "sourceUrl": "https://github.com/KilledByAPixel/LittleJS",
+    "license": "MIT",
+    "author": "Frank Force (KilledByAPixel)",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "little-platformer",
+    "title": "Pixel Platformer",
+    "description": "Side-scrolling platformer with destructible terrain, enemies, and tight controls. Built with LittleJS.",
+    "thumbnail": "/thumbs/little-platformer.svg",
+    "path": "/games/little-platformer/index.html",
+    "categories": [
+      "platformer",
+      "action"
+    ],
+    "tags": [
+      "polished",
+      "single-player",
+      "pixel-art"
+    ],
+    "controls": "← → move · ↑ jump · X shoot",
+    "sourceUrl": "https://github.com/KilledByAPixel/LittleJS",
+    "license": "MIT",
+    "author": "Frank Force (KilledByAPixel)",
+    "aspectRatio": "16:9",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "sudoku",
+    "title": "Sudoku",
+    "description": "Classic 9×9 number puzzle. Solve at three difficulty levels with auto-generated puzzles.",
+    "thumbnail": "/thumbs/sudoku.svg",
+    "path": "/games/sudoku/index.html",
+    "categories": [
+      "puzzle"
+    ],
+    "tags": [
+      "logic",
+      "numbers",
+      "single-player"
+    ],
+    "controls": "Click cell · Type 1–9 · Backspace clears",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": true,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "reversi",
+    "title": "Reversi",
+    "description": "Flank the CPU's discs to flip them. Whoever owns the most squares when the board fills up wins.",
+    "thumbnail": "/thumbs/reversi.svg",
+    "path": "/games/reversi/index.html",
+    "categories": [
+      "strategy"
+    ],
+    "tags": [
+      "classic",
+      "vs-cpu",
+      "board"
+    ],
+    "controls": "Click / Tap",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "lights-out",
+    "title": "Lights Out",
+    "description": "Click cells to toggle them and their neighbors. Turn every light off. Minimum moves wins.",
+    "thumbnail": "/thumbs/lights-out.svg",
+    "path": "/games/lights-out/index.html",
+    "categories": [
+      "puzzle"
+    ],
+    "tags": [
+      "logic",
+      "single-player"
+    ],
+    "controls": "Click / Tap",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "simon",
+    "title": "Memory Sequence",
+    "description": "Watch the sequence, repeat it back. Each round adds one more. Sound on for full effect.",
+    "thumbnail": "/thumbs/simon.svg",
+    "path": "/games/simon/index.html",
+    "categories": [
+      "casual",
+      "puzzle"
+    ],
+    "tags": [
+      "memory",
+      "sound",
+      "single-player"
+    ],
+    "controls": "Click / Tap quadrants",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "1:1",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "sky-stack",
+    "title": "Sky Stack",
+    "description": "Stack blocks high into the sky. Real-time 3D with lighting, shadows, and a camera that rises with you. Built with Three.js.",
+    "thumbnail": "/thumbs/sky-stack.svg",
+    "path": "/games/sky-stack/index.html",
+    "categories": [
+      "arcade",
+      "casual"
+    ],
+    "tags": [
+      "3d",
+      "one-button",
+      "timing",
+      "polished"
+    ],
+    "controls": "Click · Tap · Space",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "16:9",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "tunnel-runner",
+    "title": "Tunnel Runner",
+    "description": "Pilot a ship through a procedurally generated 3D tunnel. Speed ramps up, obstacles ramp up too.",
+    "thumbnail": "/thumbs/tunnel-runner.svg",
+    "path": "/games/tunnel-runner/index.html",
+    "categories": [
+      "arcade",
+      "action"
+    ],
+    "tags": [
+      "3d",
+      "endless-runner",
+      "polished"
+    ],
+    "controls": "Move mouse · A D · Arrow keys",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "16:9",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "cube-roll",
+    "title": "Cube Roll",
+    "description": "Roll a metal ball along a 3D path. Collect every gem, reach the green ring, don't fall off.",
+    "thumbnail": "/thumbs/cube-roll.svg",
+    "path": "/games/cube-roll/index.html",
+    "categories": [
+      "puzzle",
+      "arcade"
+    ],
+    "tags": [
+      "3d",
+      "physics",
+      "polished"
+    ],
+    "controls": "WASD · Arrow keys · Drag",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "16:9",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "sparkstorm",
+    "title": "Sparkstorm",
+    "description": "A top-down arena shooter. Move with WASD, aim with the mouse, drop waves of incoming geometric attackers.",
+    "thumbnail": "/thumbs/sparkstorm.svg",
+    "path": "/games/sparkstorm/index.html",
+    "categories": [
+      "shooter",
+      "arcade",
+      "action"
+    ],
+    "tags": [
+      "twin-stick",
+      "survival",
+      "single-player",
+      "polished"
+    ],
+    "controls": "WASD / Arrow keys to move · Mouse to aim · Click / Space to fire",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "16:9",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  },
+  {
+    "slug": "neon-drift",
+    "title": "Neon Drift",
+    "description": "Race down a neon highway. Switch lanes to dodge slower cars, grab sparks for nitro boost. Speed ramps up forever.",
+    "thumbnail": "/thumbs/neon-drift.svg",
+    "path": "/games/neon-drift/index.html",
+    "categories": [
+      "racing",
+      "arcade"
+    ],
+    "tags": [
+      "endless",
+      "lane-dodge",
+      "single-player",
+      "polished"
+    ],
+    "controls": "A D / ← → to switch lanes · Tap left/right on mobile",
+    "sourceUrl": "https://github.com/gegegemu/games",
+    "license": "MIT",
+    "author": "gegegemu",
+    "aspectRatio": "9:16",
+    "featured": false,
+    "addedAt": "2026-05-27"
+  }
+]

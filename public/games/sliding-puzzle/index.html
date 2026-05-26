@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Sliding Puzzle</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,107,53,.15),transparent 60%),
+               linear-gradient(180deg,#020617,#0b1224);
+    display:flex;align-items:center;justify-content:center;padding:14px;user-select:none;-webkit-user-select:none}
+  .wrap{display:flex;flex-direction:column;gap:14px;width:100%;max-width:420px}
+  .hud{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .pill{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}
+  .move{color:#ffb627}.time{color:#ff6b35}
+  .size select{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:8px;color:#fff;padding:6px 10px;font-size:13px}
+  .board{display:grid;gap:8px;aspect-ratio:1;background:rgba(15,23,42,.5);padding:8px;border-radius:14px;border:1px solid #1e293b}
+  .tile{aspect-ratio:1;border-radius:10px;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;box-shadow:0 4px 12px -4px rgba(255,107,53,.5);transition:transform .15s}
+  .tile:active{transform:scale(.96)}
+  .tile.empty{background:transparent;box-shadow:none;cursor:default}
+  .tile.correct{background:linear-gradient(135deg,#16a34a,#22c55e);box-shadow:0 4px 12px -4px rgba(34,197,94,.4)}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:10px 22px;border-radius:999px;cursor:pointer;align-self:center}
+  .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.7);backdrop-filter:blur(8px);z-index:10}
+  .overlay.show{display:flex}
+  .card{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:28px;max-width:320px;text-align:center}
+  h1{margin:0 0 8px;font-size:30px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 18px;color:#94a3b8;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="pill move">🎯 <span id="moves">0</span> moves</div>
+    <div class="pill time">⏱ <span id="time">0</span>s</div>
+    <div class="size"><select id="size"><option value="3">3 × 3</option><option value="4" selected>4 × 4</option><option value="5">5 × 5</option></select></div>
+  </div>
+  <div class="board" id="board"></div>
+  <button class="btn" id="shuffle">Shuffle</button>
+</div>
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h1>Solved!</h1>
+    <p id="result"></p>
+    <button class="btn" id="again">Play again</button>
+  </div>
+</div>
+<script>
+(() => {
+  const boardEl = document.getElementById('board');
+  const movesEl = document.getElementById('moves'), timeEl = document.getElementById('time');
+  const overlay = document.getElementById('overlay'), resultEl = document.getElementById('result');
+  const sizeSel = document.getElementById('size');
+  let n, tiles, blank, moves, t0, timer;
+
+  function build(){
+    n = +sizeSel.value;
+    boardEl.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+    tiles = [];
+    for (let i=0;i<n*n-1;i++) tiles.push(i+1);
+    tiles.push(0); // blank last
+    shuffle();
+    moves = 0; movesEl.textContent = 0; timeEl.textContent = 0;
+    clearInterval(timer); t0 = null;
+    render();
+  }
+  function shuffle(){
+    // do many random valid moves to ensure solvable
+    const total = n*n;
+    blank = total-1;
+    for (let i=0;i<n*n*40;i++){
+      const neigh = neighbors(blank);
+      const swap = neigh[(Math.random()*neigh.length)|0];
+      [tiles[blank], tiles[swap]] = [tiles[swap], tiles[blank]];
+      blank = swap;
+    }
+  }
+  function neighbors(idx){
+    const r = (idx/n)|0, c = idx%n;
+    const list = [];
+    if (r>0) list.push(idx-n);
+    if (r<n-1) list.push(idx+n);
+    if (c>0) list.push(idx-1);
+    if (c<n-1) list.push(idx+1);
+    return list;
+  }
+  function startTimer(){ if (timer) return; t0 = Date.now();
+    timer = setInterval(()=> timeEl.textContent = Math.floor((Date.now()-t0)/1000), 250);
+  }
+  function move(i){
+    if (!neighbors(blank).includes(i)) return;
+    if (!t0) startTimer();
+    [tiles[blank], tiles[i]] = [tiles[i], tiles[blank]];
+    blank = i; moves++; movesEl.textContent = moves;
+    render();
+    if (solved()) win();
+  }
+  function solved(){
+    for (let i=0;i<n*n-1;i++) if (tiles[i] !== i+1) return false;
+    return true;
+  }
+  function win(){
+    clearInterval(timer);
+    resultEl.textContent = `${moves} moves · ${timeEl.textContent}s`;
+    setTimeout(()=> overlay.classList.add('show'), 250);
+  }
+  function render(){
+    boardEl.innerHTML='';
+    tiles.forEach((v, i) => {
+      const t = document.createElement('div');
+      t.className = 'tile' + (v === 0 ? ' empty' : '') + (v && v === i+1 ? ' correct' : '');
+      t.textContent = v || '';
+      if (v) t.addEventListener('click', () => move(i));
+      boardEl.appendChild(t);
+    });
+  }
+  document.getElementById('shuffle').addEventListener('click', () => { overlay.classList.remove('show'); build(); });
+  document.getElementById('again').addEventListener('click', () => { overlay.classList.remove('show'); build(); });
+  sizeSel.addEventListener('change', build);
+  build();
+})();
+</script>
+</body>
+</html>

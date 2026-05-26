@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Neon Drift</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,sans-serif;color:#f1f5f9;background:#020617;
+    display:flex;align-items:center;justify-content:center;padding:12px;user-select:none;-webkit-user-select:none;touch-action:none}
+  canvas{display:block;height:100%;max-height:min(100%,calc(95vw*16/9));aspect-ratio:9/16;border-radius:14px;border:1px solid #1e293b;background:#0a0f24;box-shadow:0 0 80px -20px rgba(255,107,53,.4)}
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.55);backdrop-filter:blur(10px);z-index:10;padding:20px}
+  .card{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:30px;max-width:340px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}
+  h1{margin:0 0 8px;font-size:34px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 18px;color:#94a3b8;font-size:14px;line-height:1.5}
+  .stats{display:flex;gap:10px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+  .stat{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);padding:8px 14px;border-radius:10px;font-size:13px}
+  .stat b{display:block;font-size:20px;color:#ffb627}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;font-size:18px;padding:14px 32px;border-radius:999px;cursor:pointer;box-shadow:0 12px 28px -10px rgba(255,107,53,.5)}
+</style>
+</head>
+<body>
+<canvas id="c" width="450" height="800"></canvas>
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h1 id="title">Neon Drift</h1>
+    <p id="msg">Race through endless traffic.<br><br><b>A / D</b> or <b>← →</b> to switch lanes.<br>Grab sparks for boost.</p>
+    <div class="stats" id="stats" style="display:none"></div>
+    <button class="btn" id="btn">Drive</button>
+  </div>
+</div>
+<script>
+(() => {
+  const cv = document.getElementById('c'); const ctx = cv.getContext('2d');
+  const overlay = document.getElementById('overlay'), titleEl = document.getElementById('title'), msgEl = document.getElementById('msg'), statsEl = document.getElementById('stats'), btn = document.getElementById('btn');
+  const W = 450, H = 800;
+
+  // road geometry
+  const LANES = 4;
+  const ROAD_MARGIN = 35;
+  const ROAD_W = W - ROAD_MARGIN * 2;
+  const LANE_W = ROAD_W / LANES;
+  const laneX = i => ROAD_MARGIN + LANE_W * (i + 0.5);
+
+  // input
+  const keys = {};
+  let touchDir = 0, touchT = 0;
+  addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if (['arrowleft','arrowright','a','d',' '].includes(k)){ e.preventDefault(); }
+    if ((k === 'arrowleft'  || k === 'a') && !keys[k]) moveLane(-1);
+    if ((k === 'arrowright' || k === 'd') && !keys[k]) moveLane(+1);
+    keys[k] = true;
+  });
+  addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+  // touch: tap left half = left lane, tap right half = right lane
+  cv.addEventListener('pointerdown', e => {
+    if (!alive) return;
+    const r = cv.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width * W;
+    if (x < W / 2) moveLane(-1);
+    else moveLane(+1);
+  });
+
+  // state
+  let player, traffic, sparks, dust, lane, laneTarget, speed, distance, best, hp, alive, last, spawnT, sparkT, boostTimer, screenShake;
+
+  function seedDust(){
+    dust = [];
+    for (let i = 0; i < 30; i++){
+      dust.push({ x: ROAD_MARGIN + Math.random() * ROAD_W, y: Math.random() * H, s: 1 + Math.random() * 2 });
+    }
+  }
+  function reset(){
+    player = { x: laneX(1), y: H - 130, w: 48, h: 80 };
+    lane = 1; laneTarget = laneX(lane);
+    traffic = []; sparks = []; seedDust();
+    speed = 280; distance = 0; hp = 3;
+    boostTimer = 0; screenShake = 0;
+    spawnT = 0.4; sparkT = 1.5;
+    alive = true; last = performance.now();
+  }
+  function moveLane(dir){
+    if (!alive) return;
+    lane = Math.max(0, Math.min(LANES - 1, lane + dir));
+    laneTarget = laneX(lane);
+  }
+  best = +localStorage.getItem('neondrift_best') || 0;
+
+  function spawnCar(){
+    const l = (Math.random() * LANES) | 0;
+    // don't spawn directly on top of recent same-lane car
+    const last = traffic[traffic.length - 1];
+    if (last && last.lane === l && last.y < 180) return;
+    const colors = ['#3b82f6', '#22c55e', '#a855f7', '#ec4899', '#06b6d4', '#94a3b8'];
+    const c = colors[(Math.random() * colors.length) | 0];
+    traffic.push({
+      lane: l, x: laneX(l), y: -100,
+      w: 46, h: 74,
+      vy: speed * (0.35 + Math.random() * 0.25),
+      color: c,
+    });
+  }
+  function spawnSpark(){
+    const l = (Math.random() * LANES) | 0;
+    sparks.push({ lane: l, x: laneX(l), y: -30, r: 12, t: 0 });
+  }
+
+  function step(dt){
+    if (!alive) return;
+    distance += speed * dt;
+    speed = Math.min(720, speed + dt * 8);
+    if (boostTimer > 0) { speed += dt * 60; boostTimer -= dt; }
+
+    // smooth lane
+    player.x += (laneTarget - player.x) * (1 - Math.exp(-15 * dt));
+
+    // spawn
+    spawnT -= dt; if (spawnT <= 0){ spawnCar(); spawnT = Math.max(0.32, 1.05 - speed / 1000); }
+    sparkT -= dt; if (sparkT <= 0){ spawnSpark(); sparkT = 1.4 + Math.random() * 1.2; }
+
+    // traffic moves down relative to player
+    const rel = speed - 0; // relative scroll speed
+    for (const t of traffic){
+      t.y += (rel - t.vy) * dt;
+    }
+    traffic = traffic.filter(t => t.y < H + 100);
+
+    // sparks
+    for (const s of sparks){
+      s.y += rel * dt;
+      s.t += dt * 6;
+    }
+    sparks = sparks.filter(s => s.y < H + 30);
+
+    // dust streaks (road texture)
+    for (const d of dust){
+      d.y += rel * dt;
+      if (d.y > H){ d.y = -10; d.x = ROAD_MARGIN + Math.random() * ROAD_W; }
+    }
+
+    // collisions
+    for (let i = traffic.length - 1; i >= 0; i--){
+      const t = traffic[i];
+      if (Math.abs(t.x - player.x) < (t.w + player.w) / 2 * 0.78 &&
+          Math.abs(t.y - player.y) < (t.h + player.h) / 2 * 0.78){
+        traffic.splice(i, 1);
+        hp--;
+        screenShake = 0.4;
+        speed = Math.max(180, speed * 0.55);
+        if (hp <= 0) return gameover();
+      }
+    }
+    for (let i = sparks.length - 1; i >= 0; i--){
+      const s = sparks[i];
+      if (Math.abs(s.x - player.x) < player.w / 2 + s.r &&
+          Math.abs(s.y - player.y) < player.h / 2 + s.r){
+        sparks.splice(i, 1);
+        boostTimer = 1.5;
+      }
+    }
+
+    if (screenShake > 0) screenShake -= dt;
+  }
+
+  function drawCar(x, y, w, h, color, isPlayer){
+    const k = isPlayer ? 1.0 : 1.0;
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    roundRect(x - w/2 + 4, y - h/2 + 6, w, h, 10); ctx.fill();
+    // body
+    const grad = ctx.createLinearGradient(x - w/2, y, x + w/2, y);
+    grad.addColorStop(0, lighten(color, 0.10));
+    grad.addColorStop(0.5, color);
+    grad.addColorStop(1, darken(color, 0.25));
+    ctx.fillStyle = grad;
+    roundRect(x - w/2, y - h/2, w, h, 10); ctx.fill();
+    // windshield
+    ctx.fillStyle = 'rgba(180,220,255,0.85)';
+    roundRect(x - w*0.36, y - h*0.34, w*0.72, h*0.22, 5); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillRect(x - w*0.34, y - h*0.32, w*0.18, 2);
+    // rear window
+    ctx.fillStyle = 'rgba(60,80,120,0.5)';
+    roundRect(x - w*0.34, y + h*0.10, w*0.68, h*0.20, 5); ctx.fill();
+    // headlights / taillights
+    if (isPlayer){
+      ctx.shadowColor = '#ffe27a'; ctx.shadowBlur = 14;
+      ctx.fillStyle = '#fffbe8';
+      ctx.fillRect(x - w*0.40, y - h*0.48, w*0.20, 4);
+      ctx.fillRect(x + w*0.20, y - h*0.48, w*0.20, 4);
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(x - w*0.40, y + h*0.44, w*0.18, 3);
+      ctx.fillRect(x + w*0.22, y + h*0.44, w*0.18, 3);
+    }
+  }
+
+  function draw(){
+    // background — dark road off-edges, neon road center
+    ctx.fillStyle = '#050818';
+    ctx.fillRect(0, 0, W, H);
+
+    // camera shake offset
+    const sx = screenShake > 0 ? (Math.random() - 0.5) * screenShake * 14 : 0;
+    const sy = screenShake > 0 ? (Math.random() - 0.5) * screenShake * 14 : 0;
+    ctx.save();
+    ctx.translate(sx, sy);
+
+    // road surface
+    ctx.fillStyle = '#0c1428';
+    ctx.fillRect(ROAD_MARGIN, 0, ROAD_W, H);
+
+    // road edge neon lines
+    ctx.shadowColor = '#ff6b35'; ctx.shadowBlur = 16;
+    ctx.fillStyle = '#ff6b35';
+    ctx.fillRect(ROAD_MARGIN - 3, 0, 3, H);
+    ctx.fillRect(W - ROAD_MARGIN, 0, 3, H);
+    ctx.shadowBlur = 0;
+
+    // lane dashes
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    const dashH = 36, dashGap = 26;
+    const off = (distance * 0.6) % (dashH + dashGap);
+    for (let i = 1; i < LANES; i++){
+      const x = ROAD_MARGIN + LANE_W * i - 2;
+      for (let y = -dashH + off; y < H; y += dashH + dashGap){
+        ctx.fillRect(x, y, 4, dashH);
+      }
+    }
+
+    // dust
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    for (const d of dust) ctx.fillRect(d.x, d.y, d.s * 0.6, d.s * 4);
+
+    // sparks (collectibles)
+    for (const s of sparks){
+      const pulse = 1 + Math.sin(s.t) * 0.18;
+      ctx.shadowColor = '#ffb627'; ctx.shadowBlur = 18;
+      const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * pulse);
+      grad.addColorStop(0, '#fff');
+      grad.addColorStop(0.4, '#ffe27a');
+      grad.addColorStop(1, '#ff6b35');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r * pulse, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // traffic
+    for (const t of traffic) drawCar(t.x, t.y, t.w, t.h, t.color, false);
+
+    // boost trail behind player
+    if (boostTimer > 0){
+      for (let i = 0; i < 6; i++){
+        const o = i * 8;
+        ctx.fillStyle = `rgba(255,${100 + i*20},40,${(6-i)/14})`;
+        ctx.fillRect(player.x - 4, player.y + player.h/2 + o, 8, 12);
+      }
+    }
+
+    // player
+    drawCar(player.x, player.y, player.w, player.h, '#ff6b35', true);
+
+    ctx.restore();
+
+    // HUD
+    drawHUD();
+  }
+
+  function drawHUD(){
+    // distance pill (top-left)
+    drawPill(12, 12, 158, 50, '#ff6b35', '⚡', 'METERS', Math.floor(distance).toString());
+    // speed pill (top-right)
+    drawPill(W - 158 - 12, 12, 158, 50, '#a855f7', '◆', 'KM/H', Math.floor(speed / 4).toString());
+    // hp hearts (top-center)
+    const hy = 36, hx0 = W/2 + 24;
+    for (let i = 0; i < 3; i++){
+      const x = hx0 - i * 22;
+      ctx.fillStyle = i < hp ? '#ef4444' : 'rgba(239,68,68,0.18)';
+      ctx.shadowColor = i < hp ? '#ef4444' : 'transparent';
+      ctx.shadowBlur = i < hp ? 10 : 0;
+      drawHeart(x, hy, 8);
+      ctx.shadowBlur = 0;
+    }
+  }
+  function drawPill(x, y, w, h, accent, icon, label, value){
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    roundRect(x, y+3, w, h, h/2); ctx.fill();
+    const g = ctx.createLinearGradient(x, y, x, y+h);
+    g.addColorStop(0, 'rgba(28,36,70,0.92)'); g.addColorStop(1, 'rgba(11,18,36,0.92)');
+    ctx.fillStyle = g; roundRect(x, y, w, h, h/2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 1.4;
+    roundRect(x+0.5, y+0.5, w-1, h-1, (h-1)/2); ctx.stroke();
+    const ir = h * 0.34, ix = x + h*0.5, iy = y + h*0.5;
+    const ig = ctx.createLinearGradient(ix, iy-ir, ix, iy+ir);
+    ig.addColorStop(0, lighten(accent, 0.25)); ig.addColorStop(1, accent);
+    ctx.fillStyle = ig;
+    ctx.beginPath(); ctx.arc(ix, iy, ir, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold ' + (ir*1.1) + 'px system-ui,Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(icon, ix, iy);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = 'rgba(147,160,198,0.95)'; ctx.font = '700 10px system-ui,Arial';
+    ctx.fillText(label, x + h*0.92, y + 10);
+    ctx.fillStyle = '#fff'; ctx.font = '800 19px system-ui,Arial';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(value, x + h*0.92, y + h*0.65);
+  }
+  function drawHeart(cx, cy, s){
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + s*0.55);
+    ctx.bezierCurveTo(cx, cy, cx-s, cy, cx-s, cy-s*0.4);
+    ctx.bezierCurveTo(cx-s, cy-s, cx, cy-s, cx, cy-s*0.3);
+    ctx.bezierCurveTo(cx, cy-s, cx+s, cy-s, cx+s, cy-s*0.4);
+    ctx.bezierCurveTo(cx+s, cy, cx, cy, cx, cy + s*0.55);
+    ctx.closePath(); ctx.fill();
+  }
+  function roundRect(x, y, w, h, r){
+    r = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+    ctx.arcTo(x+w, y, x+w, y+r, r); ctx.lineTo(x+w, y+h-r);
+    ctx.arcTo(x+w, y+h, x+w-r, y+h, r); ctx.lineTo(x+r, y+h);
+    ctx.arcTo(x, y+h, x, y+h-r, r); ctx.lineTo(x, y+r);
+    ctx.arcTo(x, y, x+r, y, r); ctx.closePath();
+  }
+  function lighten(hex, amt){
+    const c = hex.replace('#',''); const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+    const m = v => Math.min(255, Math.round(v + (255-v)*amt));
+    return `rgb(${m(r)},${m(g)},${m(b)})`;
+  }
+  function darken(hex, amt){
+    const c = hex.replace('#',''); const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+    const m = v => Math.max(0, Math.round(v * (1-amt)));
+    return `rgb(${m(r)},${m(g)},${m(b)})`;
+  }
+
+  function gameover(){
+    alive = false;
+    const d = Math.floor(distance);
+    if (d > best){ best = d; localStorage.setItem('neondrift_best', best); }
+    titleEl.textContent = 'Crashed';
+    msgEl.textContent = '';
+    statsEl.style.display = 'flex';
+    statsEl.innerHTML = `<div class="stat">Meters<b>${d}</b></div><div class="stat">Top<b>${Math.floor(speed/4)} km/h</b></div><div class="stat">Best<b>${best}</b></div>`;
+    btn.textContent = 'Drive again';
+    overlay.style.display = 'flex';
+  }
+  function start(){ reset(); overlay.style.display = 'none'; }
+  btn.addEventListener('click', start);
+
+  function loop(t){
+    const dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+  reset(); alive = false; last = performance.now();
+  overlay.style.display = 'flex';
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

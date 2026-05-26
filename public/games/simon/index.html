@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Memory Sequence</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,107,53,.15),transparent 60%),
+               linear-gradient(180deg,#020617,#0b1224);
+    display:flex;align-items:center;justify-content:center;padding:14px;user-select:none;-webkit-user-select:none}
+  .wrap{display:flex;flex-direction:column;gap:14px;align-items:center;width:100%;max-width:420px}
+  .hud{display:flex;justify-content:space-between;width:100%;gap:8px}
+  .pill{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}
+  .lvl{color:#ffb627}.best{color:#22c55e}
+  .pad{position:relative;width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:8px solid #0b1224;box-shadow:0 0 60px -20px rgba(255,182,39,.3)}
+  .quad{position:absolute;width:50%;height:50%;cursor:pointer;transition:filter .15s}
+  .quad:hover{filter:brightness(1.2)}
+  .q0{top:0;left:0;background:#ef4444;border-top-left-radius:100%}
+  .q1{top:0;right:0;background:#22c55e;border-top-right-radius:100%}
+  .q2{bottom:0;left:0;background:#facc15;border-bottom-left-radius:100%}
+  .q3{bottom:0;right:0;background:#3b82f6;border-bottom-right-radius:100%}
+  .quad.flash{filter:brightness(1.8) saturate(1.4)}
+  .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:25%;height:25%;background:#020617;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;border:4px solid #0b1224}
+  .status{font-size:14px;color:#94a3b8;text-align:center;min-height:20px}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:10px 22px;border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <div class="pill lvl">Level: <span id="lvl">0</span></div>
+    <div class="pill best">Best: <span id="best">0</span></div>
+  </div>
+  <div class="pad" id="pad">
+    <div class="quad q0" data-q="0"></div>
+    <div class="quad q1" data-q="1"></div>
+    <div class="quad q2" data-q="2"></div>
+    <div class="quad q3" data-q="3"></div>
+    <div class="center" id="center">▶</div>
+  </div>
+  <div class="status" id="status">Press the center to start</div>
+</div>
+<script>
+(() => {
+  const pad = document.getElementById('pad');
+  const center = document.getElementById('center');
+  const lvlEl = document.getElementById('lvl'), bestEl = document.getElementById('best'), statusEl = document.getElementById('status');
+  const quads = Array.from(document.querySelectorAll('.quad'));
+  let sequence, step, accepting;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const tones = [261.63, 329.63, 392.00, 523.25];
+  function beep(i){ const o = ctx.createOscillator(), g = ctx.createGain(); o.type='sine'; o.frequency.value = tones[i]; o.connect(g); g.connect(ctx.destination); g.gain.setValueAtTime(0.15, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.35); o.start(); o.stop(ctx.currentTime+0.4); }
+  function flash(i){ const q = quads[i]; q.classList.add('flash'); beep(i); setTimeout(()=>q.classList.remove('flash'), 320); }
+  bestEl.textContent = +localStorage.getItem('simon_best') || 0;
+
+  async function playSequence(){
+    accepting = false; statusEl.textContent = 'Watch…';
+    for (let i=0;i<sequence.length;i++){
+      await new Promise(r => setTimeout(r, 400));
+      flash(sequence[i]);
+      await new Promise(r => setTimeout(r, 350));
+    }
+    accepting = true; step = 0;
+    statusEl.textContent = `Your turn (${sequence.length})`;
+  }
+  function start(){
+    sequence = []; lvlEl.textContent = 0; nextRound();
+  }
+  function nextRound(){
+    sequence.push((Math.random()*4)|0);
+    lvlEl.textContent = sequence.length;
+    setTimeout(playSequence, 500);
+  }
+  function fail(){
+    accepting = false;
+    const best = +localStorage.getItem('simon_best') || 0;
+    if (sequence.length - 1 > best){ localStorage.setItem('simon_best', sequence.length - 1); bestEl.textContent = sequence.length - 1; }
+    statusEl.textContent = `Wrong! Reached level ${sequence.length}. Tap center to retry.`;
+  }
+  quads.forEach(q => q.addEventListener('click', () => {
+    if (!accepting) return;
+    const i = +q.dataset.q;
+    flash(i);
+    if (sequence[step] !== i){ fail(); return; }
+    step++;
+    if (step === sequence.length){ accepting = false; setTimeout(nextRound, 700); }
+  }));
+  center.addEventListener('click', () => { ctx.resume(); start(); });
+})();
+</script>
+</body>
+</html>

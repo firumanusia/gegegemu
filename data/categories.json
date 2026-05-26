@@ -1,0 +1,12 @@
+[
+  { "slug": "puzzle", "name": "Puzzle", "icon": "puzzle" },
+  { "slug": "arcade", "name": "Arcade", "icon": "joystick" },
+  { "slug": "action", "name": "Action", "icon": "swords" },
+  { "slug": "casual", "name": "Casual", "icon": "smile" },
+  { "slug": "strategy", "name": "Strategy", "icon": "brain" },
+  { "slug": "racing", "name": "Racing", "icon": "car" },
+  { "slug": "sports", "name": "Sports", "icon": "trophy" },
+  { "slug": "shooter", "name": "Shooter", "icon": "target" },
+  { "slug": "platformer", "name": "Platformer", "icon": "mountain" },
+  { "slug": "card", "name": "Card", "icon": "spade" }
+]

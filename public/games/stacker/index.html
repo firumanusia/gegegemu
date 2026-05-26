@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Stacker</title>
+<style>
+  :root{color-scheme:dark}*{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,sans-serif;color:#f1f5f9;
+    background:linear-gradient(180deg,#020617,#0b1224);
+    display:flex;align-items:center;justify-content:center;padding:12px;user-select:none;-webkit-user-select:none;touch-action:manipulation;cursor:pointer}
+  canvas{border-radius:14px;border:1px solid #1e293b;background:#0a0f1f;display:block;box-shadow:0 0 80px -20px rgba(255,107,53,.3)}
+  .hud{position:fixed;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:5}
+  .pill{background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:999px;padding:6px 16px;font-size:18px;font-weight:700;backdrop-filter:blur(8px);color:#ffb627}
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.7);backdrop-filter:blur(8px);z-index:10}
+  .card{background:rgba(15,23,42,.85);border:1px solid #1e293b;border-radius:18px;padding:28px;max-width:320px;text-align:center}
+  h1{margin:0 0 8px;font-size:32px;background:linear-gradient(135deg,#ff6b35,#ffb627);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{margin:0 0 18px;color:#94a3b8;font-size:14px}
+  .btn{border:0;background:linear-gradient(135deg,#ff6b35,#ffb627);color:white;font-weight:700;padding:12px 28px;border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c" width="360" height="640"></canvas>
+<div class="hud"><span class="pill" id="score">0</span></div>
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h1 id="title">Stacker</h1>
+    <p id="msg">Click, tap, or press Space when the block lines up. Miss and the overhang gets chopped off. How tall can you stack?</p>
+    <button class="btn" id="btn">Start</button>
+  </div>
+</div>
+<script>
+(() => {
+  const cv = document.getElementById('c'); const ctx = cv.getContext('2d');
+  const W = 360, H = 640;
+  const overlay = document.getElementById('overlay'), titleEl=document.getElementById('title'), msgEl=document.getElementById('msg'), btn=document.getElementById('btn');
+  const scoreEl = document.getElementById('score');
+
+  let stack, current, dir, speed, alive, raf;
+
+  function hueFor(i){
+    const start = 14, end = 200; // orange → cyan
+    const h = start + (i * 8) % 360;
+    return `hsl(${(start + i*7) % 360}, 80%, 60%)`;
+  }
+  function reset(){
+    const baseW = 220, baseY = H - 40, baseX = (W-baseW)/2;
+    stack = [{ x: baseX, w: baseW, y: baseY, color:'#ff6b35', perfectCount: 0 }];
+    spawnNext(); alive = true; updateScore();
+  }
+  function spawnNext(){
+    const last = stack[stack.length-1];
+    const y = last.y - 28;
+    const newY = y;
+    current = { x: -last.w, w: last.w, y: newY, color: hueFor(stack.length) };
+    dir = 1;
+    speed = 2.6 + Math.min(4, stack.length*0.08);
+  }
+  function updateScore(){ scoreEl.textContent = stack.length - 1; }
+  function loop(){
+    if (!alive) return;
+    current.x += dir * speed;
+    if (current.x + current.w > W) { current.x = W - current.w; dir = -1; }
+    if (current.x < 0) { current.x = 0; dir = 1; }
+    draw();
+    raf = requestAnimationFrame(loop);
+  }
+  function place(){
+    if (!alive) return;
+    const last = stack[stack.length-1];
+    const overlapL = Math.max(current.x, last.x);
+    const overlapR = Math.min(current.x + current.w, last.x + last.w);
+    const overlap = overlapR - overlapL;
+    if (overlap <= 0) return gameover();
+    // perfect snap tolerance
+    const diff = current.x - last.x;
+    if (Math.abs(diff) < 3) {
+      current.x = last.x; current.w = last.w; current.perfectCount = (last.perfectCount||0)+1;
+      flashPerfect();
+    } else {
+      current.x = overlapL; current.w = overlap; current.perfectCount = 0;
+    }
+    stack.push({ ...current });
+    updateScore();
+    spawnNext();
+  }
+  let perfectFlash = 0;
+  function flashPerfect(){ perfectFlash = 1; }
+  function gameover(){
+    alive = false; cancelAnimationFrame(raf);
+    const best = +localStorage.getItem('stacker_best')||0;
+    const score = stack.length - 1;
+    if (score > best) localStorage.setItem('stacker_best', score);
+    titleEl.textContent = score > 0 ? `${score} high!` : 'Missed!';
+    msgEl.textContent = `Best: ${Math.max(best,score)}`;
+    btn.textContent = 'Play again';
+    overlay.style.display = 'flex';
+  }
+  function draw(){
+    ctx.fillStyle = '#0a0f1f'; ctx.fillRect(0,0,W,H);
+    // camera offset: when stack gets tall, shift
+    const offset = Math.max(0, stack.length*28 - H/2);
+    ctx.save(); ctx.translate(0, offset);
+    // draw stack
+    stack.forEach((b,i) => {
+      ctx.shadowColor = b.color; ctx.shadowBlur = 6;
+      ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.w, 26);
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(255,255,255,.2)'; ctx.fillRect(b.x, b.y, b.w, 3);
+      ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(b.x, b.y+23, b.w, 3);
+    });
+    // current
+    ctx.shadowColor = current.color; ctx.shadowBlur = 14;
+    ctx.fillStyle = current.color; ctx.fillRect(current.x, current.y, current.w, 26);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    // perfect flash
+    if (perfectFlash > 0){
+      ctx.fillStyle = `rgba(255,255,255,${perfectFlash*0.25})`; ctx.fillRect(0,0,W,H);
+      perfectFlash -= 0.08;
+    }
+  }
+  function start(){ overlay.style.display='none'; reset(); loop(); }
+  btn.addEventListener('click', start);
+  addEventListener('pointerdown', e => { if (e.target === btn || e.target.closest('.card')) return; place(); });
+  addEventListener('keydown', e => { if (e.key === ' '){ e.preventDefault(); place(); } });
+})();
+</script>
+</body>
+</html>
